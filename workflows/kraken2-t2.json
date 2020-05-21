@@ -15,6 +15,7 @@
             "format": "edam:format_1930"
         }],
     "output": "kraken2_out.txt",
+    "report": {"output_report": "kraken2_report.txt"},
     "paired": true,
     "gzip-compressed": true
 }

@@ -137,7 +137,7 @@ outputs:
   kraken_report:
     type: File?
     outputBinding:
-      glob: $(inputs.report)
+      glob: $(inputs.report.output_report)
   classfied_sequences:
     type: File?
     outputBinding:
