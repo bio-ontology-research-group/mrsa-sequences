@@ -32,6 +32,7 @@ inputs:
   output:
     type: string
     label: "Filename for output"
+    default: "kraken_out.txt"
     inputBinding:
       position: 0
       prefix: --output
