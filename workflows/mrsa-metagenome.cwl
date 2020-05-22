@@ -31,6 +31,13 @@ steps:
         default: true
     out: [kraken_output, kraken_report]
     run: kraken2.cwl
+  skesa:
+    in:
+      fastq: [trimGalore/fastq1_trimmed, trimGalore/fastq2_trimmed]
+      contigs_out_name:
+        default: "skesa_contigs.fa"
+    out: [contigs_out]
+    run: skesa.cwl
 
 $namespaces:
   edam: http://edamontology.org/

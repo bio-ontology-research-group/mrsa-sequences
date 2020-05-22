@@ -3,3 +3,4 @@ workflows/*.txt
 workflows/*.gz
 workflows/*.html
 workflows/*.zip
+workflows/*.fa
