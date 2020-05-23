@@ -1,0 +1,11 @@
+{
+    "reference": {
+        "class": "File",
+        "path": "/opt/data-mrsa/dbs/NC_007795.1.fasta"
+    },
+    "contigs": {
+        "class": "File",
+        "path": "skesa_contigs.fa"
+    },
+    "force": true
+}

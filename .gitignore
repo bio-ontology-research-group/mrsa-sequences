@@ -4,3 +4,11 @@ workflows/*.gz
 workflows/*.html
 workflows/*.zip
 workflows/*.fa
+workflows/*.log
+workflows/*.bam
+workflows/*.vcf
+workflows/*.bai
+workflows/*.tab
+workflows/*.csv
+workflows/*.bed
+workflows/*.gff

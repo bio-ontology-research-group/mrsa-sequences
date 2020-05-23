@@ -3,6 +3,10 @@
         "class": "Directory",
         "path": "/opt/data-mrsa/dbs/minikraken"
     },
+    "snippy_ref": {
+        "class": "File",
+        "path": "/opt/data-mrsa/dbs/NC_007795.1.fasta"
+    },
     "fastq1":{
         "class": "File",
         "path": "/opt/data-mrsa/191111_K00235_0221_AH7MN2BBXY/Lane1/version_01/M-19-2927_MRSA001_D701-D501_L001_R1_001.fastq.gz",

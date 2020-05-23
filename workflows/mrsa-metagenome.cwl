@@ -6,10 +6,20 @@ inputs:
   fastq1: File
   fastq2: File
   kraken_db: Directory
+  snippy_ref: File
 outputs:
+  krakenOutput:
+    type: File
+    outputSource: kraken2/kraken_output
   krakenReport:
     type: File
     outputSource: kraken2/kraken_report
+  skesaContigs:
+    type: File
+    outputSource: skesa/contigs_out
+  snippyVCF:
+    type: File
+    outputSource: snippy/vcf_output
 
 steps:
   trimGalore:
@@ -38,6 +48,14 @@ steps:
         default: "skesa_contigs.fa"
     out: [contigs_out]
     run: skesa.cwl
+  snippy:
+    in:
+      reference: snippy_ref
+      contigs: skesa/contigs_out
+      force:
+        default: true
+    out: [vcf_output]
+    run: snippy.cwl
 
 $namespaces:
   edam: http://edamontology.org/
