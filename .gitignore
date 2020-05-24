@@ -12,3 +12,4 @@ workflows/*.tab
 workflows/*.csv
 workflows/*.bed
 workflows/*.gff
+workflows/*.faa

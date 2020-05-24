@@ -20,6 +20,12 @@ outputs:
   snippyVCF:
     type: File
     outputSource: snippy/vcf_output
+  prokkaFAA:
+    type: File
+    outputSource: prokka/faa_output
+  prokkaGFF:
+    type: File
+    outputSource: prokka/gff_output
 
 steps:
   trimGalore:
@@ -55,6 +61,13 @@ steps:
       force:
         default: true
     out: [vcf_output]
+    run: snippy.cwl
+  prokka:
+    in:
+      fa_file: skesa/contigs_out
+      force:
+        default: true
+    out: [faa_output, gff_output]
     run: snippy.cwl
 
 $namespaces:
