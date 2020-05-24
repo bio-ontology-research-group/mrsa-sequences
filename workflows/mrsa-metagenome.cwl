@@ -26,6 +26,15 @@ outputs:
   prokkaGFF:
     type: File
     outputSource: prokka/gff_output
+  mlstTSV:
+    type: File
+    outputSource: mlst/tsv_output
+  resistomeTSV:
+    type: File
+    outputSource: abricate_resfinder/tsv_output
+  virulomeTSV:
+    type: File
+    outputSource: abricate_vfdb/tsv_output
 
 steps:
   trimGalore:
@@ -68,7 +77,27 @@ steps:
       force:
         default: true
     out: [faa_output, gff_output]
-    run: snippy.cwl
+    run: prokka.cwl
+  mlst:
+    in:
+      fa_file: skesa/contigs_out
+    out: [tsv_output]
+    run: mlst.cwl
+  abricate_vfdb:
+    in:
+      fa_file: skesa/contigs_out
+      db:
+        default: "vfdb"
+    out: [tsv_output]
+    run: abricate.cwl
+  abricate_resfinder:
+    in:
+      fa_file: skesa/contigs_out
+      db:
+        default: "resfinder"
+    out: [tsv_output]
+    run: abricate.cwl
+
 
 $namespaces:
   edam: http://edamontology.org/

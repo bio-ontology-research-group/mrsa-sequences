@@ -13,3 +13,4 @@ workflows/*.csv
 workflows/*.bed
 workflows/*.gff
 workflows/*.faa
+workflows/*.tsv
