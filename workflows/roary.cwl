@@ -25,6 +25,18 @@ inputs:
     inputBinding:
       position: 1
       prefix: '-f'
+  alignment:
+    type: boolean?
+    default: true
+    inputBinding:
+      position: 1
+      prefix: '-e'
+  fast:
+    type: boolean?
+    default: true
+    inputBinding:
+      position: 1
+      prefix: '-n'
   verbose:
     type: boolean?
     inputBinding:
