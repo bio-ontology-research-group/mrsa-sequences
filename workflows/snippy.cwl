@@ -106,7 +106,7 @@ inputs:
     label: 'Extra Freebayes options, eg. --theta 1E-6 --read-snp-limit 2 (default '''')'
   outdir:
     type: string?
-    default: '.'
+    default: 'snippy'
     inputBinding:
       position: 1
       prefix: '--outdir'
@@ -262,6 +262,11 @@ outputs:
       glob: $(inputs.outdir)/$(inputs.prefix).vcf.gz
     secondaryFiles:
       - '$(inputs.outdir)/$(inputs.prefix).vcf,gz,csi'
+  outdir:
+    label: Output directory
+    type: Directory
+    outputBinding:
+      glob: $(inputs.outdir)
   
 label: snippy
 requirements:

@@ -1,0 +1,13 @@
+{
+    "gff_files": [
+        {
+            "class": "File",
+            "path": "prokka.gff",
+        },
+        {
+            "class": "File",
+            "path": "prokka1.gff",
+        }],
+    "verbose": true
+    
+}

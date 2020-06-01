@@ -20,6 +20,9 @@ outputs:
   snippyVCF:
     type: File
     outputSource: snippy/vcf_output
+  snippyOutdir:
+    type: Directory
+    outputSource: snippy/outdir
   prokkaFAA:
     type: File
     outputSource: prokka/faa_output
@@ -66,10 +69,11 @@ steps:
   snippy:
     in:
       reference: snippy_ref
-      contigs: skesa/contigs_out
+      R1: trimGalore/fastq1_trimmed
+      R2: trimGalore/fastq2_trimmed
       force:
         default: true
-    out: [vcf_output]
+    out: [vcf_output, outdir]
     run: snippy.cwl
   prokka:
     in:
