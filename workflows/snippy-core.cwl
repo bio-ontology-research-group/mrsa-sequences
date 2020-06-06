@@ -23,7 +23,7 @@ inputs:
     label: 'Output dirs from snippy'
 
 outputs:
-  alignment:
+  alignments:
     type: File
     outputBinding:
       glob: core.full.aln

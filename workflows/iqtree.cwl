@@ -34,7 +34,6 @@ arguments:
 inputs:
   alignments:
     type: File
-    format: edam:format_1929  # FASTA
     inputBinding:
       prefix: "-s"
 
@@ -115,35 +114,35 @@ outputs:
     type: File
     outputBinding:
       glob: $(inputs.alignments.basename).mldist
-  model_information:
-    type: File
-    outputBinding:
-       glob: $(inputs.alignments.basename).model.gz
-  split_supports:
-    type: File
-    label: Ultrafast bootstrap approximation split support values
-    outputBinding:
-       glob: $(inputs.alignments.basename).splits.nex
-  ufboot_trees:
-    type: File
-    label: Ultrafast bootstrap approximation UFBoot trees
-    outputBinding:
-       glob: $(inputs.alignments.basename).ufboot
-  consensus_tree:
-    type: File
-    label: Ultrafast bootstrap approximation consensus tree
-    outputBinding:
-       glob: $(inputs.alignments.basename).contree
+  # model_information:
+  #   type: File
+  #   outputBinding:
+  #      glob: $(inputs.alignments.basename).model.gz
+  # split_supports:
+  #   type: File
+  #   label: Ultrafast bootstrap approximation split support values
+  #   outputBinding:
+  #      glob: $(inputs.alignments.basename).splits.nex
+  # ufboot_trees:
+  #   type: File
+  #   label: Ultrafast bootstrap approximation UFBoot trees
+  #   outputBinding:
+  #      glob: $(inputs.alignments.basename).ufboot
+  # consensus_tree:
+  #   type: File
+  #   label: Ultrafast bootstrap approximation consensus tree
+  #   outputBinding:
+  #      glob: $(inputs.alignments.basename).contree
   report:
     label: IQ-TREE Report
     type: File
     outputBinding:
        glob: $(inputs.alignments.basename).iqtree
-  alignment_with_unique_sequences:
-    type: File
-    label: alignment with unique sequences
-    outputBinding:
-      glob: $(inputs.alignments.basename).uniqueseq.phy
+  # alignment_with_unique_sequences:
+  #   type: File
+  #   label: alignment with unique sequences
+  #   outputBinding:
+  #     glob: $(inputs.alignments.basename).uniqueseq.phy
   log:
     type: File
     outputBinding:
@@ -152,7 +151,3 @@ outputs:
 $namespaces:
   s: http://schema.org/
   edam: http://edamontology.org/
-
-# $schemas:
-# - "http://schema.org/version/latest/schema.rdf"
-# - "http://edamontology.org/EDAM_1.18.owl"

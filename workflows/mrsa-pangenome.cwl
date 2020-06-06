@@ -4,24 +4,33 @@ requirements:
   MultipleInputFeatureRequirement: {}
 inputs:
   dirs: Directory[]
-  snippy_ref: File
+  reference: File
   gff_files: File[]
 outputs:
+  pangenome:
+    type: File
+    outputSource: roary/pangenome
+  tree:
+    type: File
+    outputSource: iqTree/result_tree
+
 
 steps:
   snippyCore:
     in:
       dirs: dirs
-      ref: snippy_ref
-    out: []
-    run: snippy_core.cwl
+      reference: reference
+    out: [alignments,outputVcf]
+    run: snippy-core.cwl
   iqTree:
     in:
-    out: []
+      alignments: snippyCore/alignments
+    out: [result_tree]
     run: iqtree.cwl
   roary:
     in:
-    out: []
+      gff_files: gff_files
+    out: [gene_presence_absence,pangenome]
     run: roary.cwl
 
 $namespaces:
