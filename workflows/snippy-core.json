@@ -1,0 +1,16 @@
+{
+    "reference": {
+        "class": "File",
+        "path": "/opt/data-mrsa/dbs/NC_007795.1.fasta"
+    },
+    "dirs": [
+        {
+            "class": "Directory",
+            "path": "snippy"
+        },
+        {
+            "class": "Directory",
+            "path": "snippy1"
+        },
+    ]
+}

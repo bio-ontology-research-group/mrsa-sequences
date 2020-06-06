@@ -23,7 +23,15 @@ inputs:
     label: 'Output dirs from snippy'
 
 outputs:
-  
+  alignment:
+    type: File
+    outputBinding:
+      glob: core.full.aln
+  outputVcf:
+    type: File
+    outputBinding:
+      glob: core.vcf
+
 label: snippy-core
 requirements:
   - class: DockerRequirement
