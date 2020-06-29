@@ -8,6 +8,7 @@ import urllib
 import getpass
 import json
 import yaml
+import socket
 
 
 ARVADOS_API_HOST = os.environ.get('ARVADOS_API_HOST', 'cborg.cbrc.kaust.edu.sa')
@@ -23,10 +24,10 @@ def upload_file(col, filename_local, filename_remote):
     lf.close()
 
 def validate_fastq(fastq_file):
-    with gzip.open(sequence_read1, 'rt') as f:
+    with gzip.open(fastq_file, 'rt') as f:
         for record in SeqIO.parse(f, 'fastq'):
             pass
-    return true
+    return True
 
 
 @ck.command()
@@ -35,9 +36,9 @@ def validate_fastq(fastq_file):
 @ck.option('--sequence-read2', '-sr2', help='Gzipped FASTQ File (*.fastq.gz) read 2')
 @ck.option('--metadata-file', '-m', help='METADATA File')
 def main(uploader_project, sequence_read1, sequence_read2, metadata_file):
+    metadata = yaml.load(open(metadata_file), Loader=yaml.FullLoader)
     validate_fastq(sequence_read1)
     validate_fastq(sequence_read2)
-    metadata = yaml.load(metadata_file, Loader=yaml.FullLoader)
     
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
     col = arvados.collection.Collection(api_client=api)
@@ -53,14 +54,14 @@ def main(uploader_project, sequence_read1, sequence_read2, metadata_file):
         username = "unknown"
 
     properties = {
-        "sequence_label": metadata['label'],
+        "sequence_label": metadata['sample'],
         "upload_app": "mrsa_uploader",
         "upload_ip": external_ip,
         "upload_user": "%s@%s" % (username, socket.gethostname())
     }
 
     col.save_new(owner_uuid=uploader_project, name="%s uploaded by %s from %s" %
-                 (seqlabel, properties['upload_user'], properties['upload_ip']),
+                 (metadata['sample'], properties['upload_user'], properties['upload_ip']),
                  properties=properties, ensure_unique_name=True)
 
     print(json.dumps(col.api_response()))
