@@ -21,7 +21,7 @@ inputs:
       position: 1
   outdir:
     type: string?
-    default: '.'
+    default: 'prokka'
     inputBinding:
       position: 1
       prefix: '--outdir'
@@ -32,7 +32,7 @@ inputs:
     inputBinding:
       position: 1
       prefix: '--prefix'
-    label: Prefix for output files (default 'snps')
+    label: Prefix for output files (default 'prokka')
   kingdom:
     type: string?
     default: 'Bacteria'
@@ -66,3 +66,8 @@ outputs:
     type: File
     outputBinding:
       glob: $(inputs.outdir)/$(inputs.prefix).faa
+  out_directory:
+    label: Output directory
+    type: Directory
+    outputBinding:
+      glob: $(inputs.outdir)

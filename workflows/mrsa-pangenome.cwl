@@ -10,9 +10,12 @@ outputs:
   pangenome:
     type: File
     outputSource: roary/pangenome
-  tree:
+  treefile:
     type: File
     outputSource: iqTree/result_tree
+  iqtree:
+    type: File
+    outputSource: iqTree/report
 
 
 steps:
@@ -25,14 +28,10 @@ steps:
   iqTree:
     in:
       alignments: snippyCore/alignments
-    out: [result_tree]
+    out: [result_tree,report]
     run: iqtree.cwl
   roary:
     in:
       gff_files: gff_files
     out: [gene_presence_absence,pangenome]
     run: roary.cwl
-
-$namespaces:
-  edam: http://edamontology.org/
-  s: http://schema.org/

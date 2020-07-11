@@ -147,7 +147,3 @@ outputs:
     type: File
     outputBinding:
       glob: $(inputs.alignments.basename).log
-
-$namespaces:
-  s: http://schema.org/
-  edam: http://edamontology.org/

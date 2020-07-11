@@ -24,9 +24,6 @@ inputs:
       - File
       - File[]
     label: "Input sequence files"
-    format:
-      - edam:format_1929  # FASTA
-      - edam:format_1930  # FASTQ
     inputBinding:
       position: 2
   output:
@@ -163,28 +160,3 @@ requirements:
     coresMin: 1
   - class: DockerRequirement
     dockerPull: "quay.io/biocontainers/kraken2:2.0.8_beta--pl526h6bb024c_0"
-
-$namespaces:
-  edam: http://edamontology.org/
-  s: http://schema.org/
-$schemas:
-  - "http://edamontology.org/EDAM.owl"
-  - "http://schema.org/version/latest/schema.rdf"
-
-s:name: "kraken2"
-s:license: "https://spdx.org/licenses/MIT.html"
-
-s:isPartOf:
-  class: s:CreativeWork
-  s:name: Common Workflow Language
-  s:url: http://commonwl.org/
-
-s:creator:
-- class: s:Organization
-  s:legalName: "South African National Bioinformatics Institute"
-  s:member:
-  - class: s:Person
-    s:name: Peter van Heusden
-    s:email: mailto:pvh@sanbi.ac.za
-    s:sameAs:
-    - id: https://orcid.org/0000-0001-6553-5274

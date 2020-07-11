@@ -162,7 +162,6 @@ arguments:
 outputs:
   fastq1_trimmed:
     type: File
-    format: edam:format_1930
     outputBinding:
       glob: |
         ${
@@ -171,7 +170,6 @@ outputs:
         }
   fastq2_trimmed:    
     type: File?
-    format: edam:format_1930
     outputBinding:
       glob: "*val_2.fq*"
   fastq1_trimmed_unpaired:    
@@ -202,7 +200,3 @@ outputs:
       items: File # since one or two matches (single/paired end)
     outputBinding:
       glob: "*fastqc.zip"
-
-$namespaces:
-  edam: http://edamontology.org/
-  s: http://schema.org/

@@ -3,6 +3,7 @@ class: Workflow
 requirements:
   MultipleInputFeatureRequirement: {}
 inputs:
+  sample_id: string
   fastq1: File
   fastq2: File
   kraken_db: Directory
@@ -22,7 +23,10 @@ outputs:
     outputSource: snippy/vcf_output
   snippyOutdir:
     type: Directory
-    outputSource: snippy/outdir
+    outputSource: snippy/out_directory
+  prokkaOutdir:
+    type: Directory
+    outputSource: prokka/out_directory
   prokkaFAA:
     type: File
     outputSource: prokka/faa_output
@@ -71,16 +75,17 @@ steps:
       reference: snippy_ref
       R1: trimGalore/fastq1_trimmed
       R2: trimGalore/fastq2_trimmed
+      outdir: sample_id
       force:
         default: true
-    out: [vcf_output, outdir]
+    out: [vcf_output, out_directory]
     run: snippy.cwl
   prokka:
     in:
       fa_file: skesa/contigs_out
       force:
         default: true
-    out: [faa_output, gff_output]
+    out: [faa_output, gff_output, out_directory]
     run: prokka.cwl
   mlst:
     in:
@@ -101,8 +106,3 @@ steps:
         default: "resfinder"
     out: [tsv_output]
     run: abricate.cwl
-
-
-$namespaces:
-  edam: http://edamontology.org/
-  s: http://schema.org/

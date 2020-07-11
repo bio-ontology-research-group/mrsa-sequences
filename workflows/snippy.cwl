@@ -3,10 +3,6 @@
 class: CommandLineTool
 cwlVersion: v1.0
 
-$namespaces:
-  edam: http://edamontology.org/
-  s: http://schema.org/
-
 baseCommand: snippy
 
 inputs:
@@ -262,7 +258,7 @@ outputs:
       glob: $(inputs.outdir)/$(inputs.prefix).vcf.gz
     secondaryFiles:
       - '$(inputs.outdir)/$(inputs.prefix).vcf,gz,csi'
-  outdir:
+  out_directory:
     label: Output directory
     type: Directory
     outputBinding:
@@ -273,3 +269,6 @@ requirements:
   - class: DockerRequirement
     dockerPull: 'quay.io/biocontainers/snippy:4.6.0--0'
   - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 4092 
+    coresMin: 1

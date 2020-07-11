@@ -37,5 +37,6 @@ requirements:
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
     coresMin: 1
+    ramMin: 4092 
   - class: DockerRequirement
     dockerPull: "quay.io/biocontainers/skesa:2.3.0--he1c1bb9_2"
