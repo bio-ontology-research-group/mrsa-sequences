@@ -14,3 +14,7 @@ workflows/*.bed
 workflows/*.gff
 workflows/*.faa
 workflows/*.tsv
+workflows/roary*
+workflows/snippy*
+workflows/core.*
+data/
