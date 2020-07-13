@@ -51,7 +51,18 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
 
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
     for r in reads[:1]:
-        inputobj = {}
+        sample_id = r['properties']['sequence_label']
+        inputobj = {
+            "kraken_db": {
+                "class": "Directory",
+                "location": "keep:da380d473187b77b9248dd8939dd8719+5443/minikraken"
+            },
+            "snippy_ref": {
+                "class": "File",
+                "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+            },
+            "sample_id": sample_id
+        }
         inputobj["fastq1"] = {
             "class": "File",
             "location": "keep:%s/reads1.fastq.gz" % r["portable_data_hash"]
@@ -60,11 +71,6 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
             "class": "File",
             "location": "keep:%s/reads2.fastq.gz" % r["portable_data_hash"]
         }
-        inputobj["metadata"] = {
-            "class": "File",
-            "location": "keep:%s/metadata.yaml" % r["portable_data_hash"]
-        }
-        sample_id = r['properties']['sequence_label']
         name = f'Metagenome analysis for {sample_id}'
         run_workflow(api, workflows_project, metagenome_workflow_uuid, name, inputobj)
 
