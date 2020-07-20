@@ -28,6 +28,8 @@ def run_workflow(api, parent_project, workflow_uuid, name, inputobj):
         tmp.write(json.dumps(inputobj, indent=2).encode('utf-8'))
         tmp.flush()
         cmd = ["arvados-cwl-runner",
+               "--submit",
+               "--no-wait",
                "--project-uuid=%s" % project["uuid"],
                "arvwf:%s" % workflow_uuid,
                tmp.name]
@@ -56,7 +58,9 @@ def get_cr_state(api, cr):
     return c['state']
 
 
-def submit_new_request(api, sample_id, portable_data_hash):
+def submit_new_request(
+        api, workflows_project, metagenome_workflow_uuid, sample_id,
+        portable_data_hash):
     inputobj = {
         "kraken_db": {
             "class": "Directory",
@@ -79,17 +83,17 @@ def submit_new_request(api, sample_id, portable_data_hash):
     name = f'Metagenome analysis for {sample_id}'
     project, proc = run_workflow(
         api, workflows_project, metagenome_workflow_uuid, name, inputobj)
+    status = 'error'
+    container_request = None
     if proc.returncode != 0:
         logging.error(proc.stderr.decode('utf-8'))
     else:
         output = proc.stderr.decode('utf-8')
-        print(output)
         lines = output.splitlines()
-
-        for line in lines:
-            if line.startswith('INFO Final output collection'):
-                col_hash = line.split()[-1]
-                print(col_hash)
+        if lines[-2].find('container_request') != -1:
+            container_request = lines[-2].split()[-1]
+            status = 'submitted'
+    return container_request, status
 
 
     
@@ -107,6 +111,10 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
     for it in reads[:1]:
         col = api.collections().get(uuid=it['uuid']).execute()
+        if 'sequence_label' not in it['properties']:
+            continue
+        if 'analysis_status' in it['properties']:
+            continue
         sample_id = it['properties']['sequence_label']
         if sample_id not in state:
             state[sample_id] = {
@@ -117,12 +125,14 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         sample_state = state[sample_id]
         if sample_state['status'] == 'new':
             container_request, status = submit_new_request(
-                sample_id, it['portable_data_hash'])
-            sample_state['status'] = 'submitted'
+                api, workflows_project, metagenome_workflow_uuid, sample_id,
+                it['portable_data_hash'])
+            sample_state['status'] = status
             sample_state['container_request'] = container_request
+            print(f'Submitted analysis request for {sample_id}')
         elif sample_state['status'] == 'submitted':
             # TODO: check container request status
-            if sample_state['container_reuqest'] is None:
+            if sample_state['container_request'] is None:
                 raise Exception("Container request cannot be empty when status is submitted")
             cr = api.container_requests().get(
                 uuid=sample_state["container_request"]).execute()
@@ -130,10 +140,19 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
             print(f'Container request for {sample_id} is {cr_state}')
             if cr_state == 'Complete':
                 out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
+                sample_state['output_collection'] = cr["output_uuid"]
                 sample_state['status'] = 'complete'
+                # Copy output files to reads collection
+                it['properties']['analysis_status'] = 'complete'
+                api.collections().update(
+                    uuid=it['uuid'],
+                    body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],
+                          "properties": it["properties"]}).execute()
         elif sample_state['status'] == 'complete':
             # TODO: do nothing
             pass
+    with open('state.json', 'w') as f:
+        f.write(json.dumps(state))
 
 if __name__ == '__main__':
     main()
