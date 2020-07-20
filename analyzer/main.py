@@ -28,18 +28,71 @@ def run_workflow(api, parent_project, workflow_uuid, name, inputobj):
         tmp.write(json.dumps(inputobj, indent=2).encode('utf-8'))
         tmp.flush()
         cmd = ["arvados-cwl-runner",
-               "--submit",
-               "--no-wait",
                "--project-uuid=%s" % project["uuid"],
                "arvwf:%s" % workflow_uuid,
                tmp.name]
         logging.info("Running %s" % ' '.join(cmd))
-        comp = subprocess.run(cmd, capture_output=True)
-    if comp.returncode != 0:
-        logging.error(comp.stderr.decode('utf-8'))
+        proc = subprocess.run(cmd, capture_output=True)
+    return project, proc
 
-    return project
+def get_cr_state(api, cr):
+    if cr['container_uuid'] is None:
+        return cr['state']
+    c = api.containers().get(uuid=cr['container_uuid']).execute()
+    if cr['state'] == 'Final' and c['state'] != 'Complete':
+        return 'Cancelled'
+    elif c['state'] in ['Locked', 'Queued']:
+        if c['priority'] == 0:
+            return 'On hold'
+        else:
+            return 'Queued'
+    elif c['state'] == 'Complete' and c['exit_code'] != 0:
+        return 'Failed'
+    elif c['state'] == 'Running':
+        if c['runtime_status'].get('error', None):
+            return 'Failing'
+        elif c['runtime_status'].get('warning', None):
+            return 'Warning'
+    return c['state']
 
+
+def submit_new_request(api, sample_id, portable_data_hash):
+    inputobj = {
+        "kraken_db": {
+            "class": "Directory",
+            "location": "keep:da380d473187b77b9248dd8939dd8719+5443/minikraken"
+        },
+        "snippy_ref": {
+            "class": "File",
+            "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+        },
+        "sample_id": sample_id
+    }
+    inputobj["fastq1"] = {
+        "class": "File",
+        "location": "keep:%s/reads1.fastq.gz" % portable_data_hash
+    }
+    inputobj["fastq2"] = {
+        "class": "File",
+        "location": "keep:%s/reads2.fastq.gz" % portable_data_hash
+    }
+    name = f'Metagenome analysis for {sample_id}'
+    project, proc = run_workflow(
+        api, workflows_project, metagenome_workflow_uuid, name, inputobj)
+    if proc.returncode != 0:
+        logging.error(proc.stderr.decode('utf-8'))
+    else:
+        output = proc.stderr.decode('utf-8')
+        print(output)
+        lines = output.splitlines()
+
+        for line in lines:
+            if line.startswith('INFO Final output collection'):
+                col_hash = line.split()[-1]
+                print(col_hash)
+
+
+    
 @ck.command()
 @ck.option('--fastq-project', '-fp', default='cborg-j7d0g-y651nepk74ziw3p', help='MRSA FASTQ sequences project uuid')
 @ck.option('--workflows-project', '-wp', default='cborg-j7d0g-lcux1tdrdshvul7', help='MRSA workflows project uuid')
@@ -48,33 +101,39 @@ def run_workflow(api, parent_project, workflow_uuid, name, inputobj):
 def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid):    
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
     col = arvados.collection.Collection(api_client=api)
-
+    state = {}
+    if os.path.exists('state.json'):
+        state = json.loads(open('state.json').read())
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
-    for r in reads[:1]:
-        sample_id = r['properties']['sequence_label']
-        inputobj = {
-            "kraken_db": {
-                "class": "Directory",
-                "location": "keep:da380d473187b77b9248dd8939dd8719+5443/minikraken"
-            },
-            "snippy_ref": {
-                "class": "File",
-                "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
-            },
-            "sample_id": sample_id
-        }
-        inputobj["fastq1"] = {
-            "class": "File",
-            "location": "keep:%s/reads1.fastq.gz" % r["portable_data_hash"]
-        }
-        inputobj["fastq2"] = {
-            "class": "File",
-            "location": "keep:%s/reads2.fastq.gz" % r["portable_data_hash"]
-        }
-        name = f'Metagenome analysis for {sample_id}'
-        run_workflow(api, workflows_project, metagenome_workflow_uuid, name, inputobj)
-
-    
+    for it in reads[:1]:
+        col = api.collections().get(uuid=it['uuid']).execute()
+        sample_id = it['properties']['sequence_label']
+        if sample_id not in state:
+            state[sample_id] = {
+                'status': 'new',
+                'container_request': None,
+                'output_collection': None,
+            }
+        sample_state = state[sample_id]
+        if sample_state['status'] == 'new':
+            container_request, status = submit_new_request(
+                sample_id, it['portable_data_hash'])
+            sample_state['status'] = 'submitted'
+            sample_state['container_request'] = container_request
+        elif sample_state['status'] == 'submitted':
+            # TODO: check container request status
+            if sample_state['container_reuqest'] is None:
+                raise Exception("Container request cannot be empty when status is submitted")
+            cr = api.container_requests().get(
+                uuid=sample_state["container_request"]).execute()
+            cr_state = get_cr_state(api, cr)
+            print(f'Container request for {sample_id} is {cr_state}')
+            if cr_state == 'Complete':
+                out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
+                sample_state['status'] = 'complete'
+        elif sample_state['status'] == 'complete':
+            # TODO: do nothing
+            pass
 
 if __name__ == '__main__':
     main()
