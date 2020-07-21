@@ -7,6 +7,7 @@ requirements:
   ResourceRequirement:
     ramMin: 8000
     coresMin: 1
+    coresMax: 2
   InlineJavascriptRequirement: {}
   ScatterFeatureRequirement: {}
   DockerRequirement:

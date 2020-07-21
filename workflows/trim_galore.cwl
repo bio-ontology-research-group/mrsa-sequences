@@ -7,9 +7,9 @@ doc: |
 
 requirements:
   InlineJavascriptRequirement: {}
-hints:
   ResourceRequirement:
     coresMin: 1
+    coresMax: 2
     ramMin: 7000
   DockerRequirement:
     dockerPull: kerstenbreuer/trim_galore:0.4.4_1.14_0.11.7

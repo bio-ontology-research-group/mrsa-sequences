@@ -3,6 +3,16 @@
 class: CommandLineTool
 cwlVersion: v1.0
 
+label: snippy
+requirements:
+  - class: DockerRequirement
+    dockerPull: 'quay.io/biocontainers/snippy:4.6.0--0'
+  - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 4092 
+    coresMin: 1
+    coresMax: 2
+
 baseCommand: snippy
 
 inputs:
@@ -264,11 +274,3 @@ outputs:
     outputBinding:
       glob: $(inputs.outdir)
   
-label: snippy
-requirements:
-  - class: DockerRequirement
-    dockerPull: 'quay.io/biocontainers/snippy:4.6.0--0'
-  - class: InlineJavascriptRequirement
-  - class: ResourceRequirement
-    ramMin: 4092 
-    coresMin: 1

@@ -10,7 +10,8 @@ requirements:
       - $(inputs.alignments)
 hints:
   ResourceRequirement:
-    coresMin: 8
+    coresMin: 1
+    coresMax: 2
   DockerRequirement:
     dockerPull: quay.io/biocontainers/iqtree:1.6.9--he860b03_1
 
