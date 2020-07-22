@@ -18,3 +18,6 @@ workflows/roary*
 workflows/snippy*
 workflows/core.*
 data/
+state.json
+workflows/MRSA094/
+workflows/prokka/

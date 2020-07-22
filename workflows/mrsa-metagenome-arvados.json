@@ -7,13 +7,13 @@
         "class": "File",
         "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
     },
-    "sample_id": "MRSA001",
+    "sample_id": "MRSA002",
     "fastq1":{
         "class": "File",
-        "location": "keep:ffdf0c0cff8a34d5120c2c63c2b1c46a+285/reads1.fastq.gz",
+        "location": "keep:c0ffbaea40130a41e9ebfcd2b488e7df+372/reads1.fastq.gz",
     },
     "fastq2": {
         "class": "File",
-        "location": "keep:ffdf0c0cff8a34d5120c2c63c2b1c46a+285/reads2.fastq.gz",
+        "location": "keep:c0ffbaea40130a41e9ebfcd2b488e7df+372/reads2.fastq.gz",
     }
 }
