@@ -9,7 +9,7 @@ requirements:
     dockerPull: 'quay.io/biocontainers/snippy:4.6.0--0'
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
-    ramMin: 4092 
+    ramMin: 15000 
     coresMin: 1
     coresMax: 2
 

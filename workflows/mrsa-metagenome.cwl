@@ -1,9 +1,13 @@
 cwlVersion: v1.1
 class: Workflow
+
 requirements:
-  - class: MultipleInputFeatureRequirement
-  - class: ResourceRequirement
+  MultipleInputFeatureRequirement: {}
+  ResourceRequirement:
+    ramMin: 2048
+    coresMin: 1
     coresMax: 2
+
 inputs:
   sample_id: string
   fastq1: File
