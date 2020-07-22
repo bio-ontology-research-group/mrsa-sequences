@@ -38,6 +38,6 @@ requirements:
   - class: ResourceRequirement
     coresMin: 1
     coresMax: 2
-    ramMin: 30000 
+    ramMin: 60000 
   - class: DockerRequirement
     dockerPull: "quay.io/biocontainers/skesa:2.3.0--he1c1bb9_2"
