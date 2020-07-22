@@ -11,7 +11,6 @@ requirements:
   - class: ResourceRequirement
     ramMin: 15000 
     coresMin: 1
-    coresMax: 2
 
 baseCommand: snippy
 

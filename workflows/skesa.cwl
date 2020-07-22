@@ -27,6 +27,17 @@ inputs:
     default: contigs.out
     inputBinding:
       prefix: --contigs_out
+  cores:
+    type: int?
+    default: 8
+    inputBinding:
+      prefix: --cores
+  memory:
+    type: int?
+    default: 30
+    inputBinding:
+      prefix: --memory
+
 outputs:
   contigs_out:
     type: File
@@ -36,8 +47,7 @@ outputs:
 requirements:
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
-    coresMin: 1
-    coresMax: 2
-    ramMin: 60000 
+    coresMin: 8
+    ramMin: 30720
   - class: DockerRequirement
     dockerPull: "quay.io/biocontainers/skesa:2.3.0--he1c1bb9_2"

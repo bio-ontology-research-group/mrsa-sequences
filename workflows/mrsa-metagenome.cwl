@@ -6,7 +6,6 @@ requirements:
   ResourceRequirement:
     ramMin: 2048
     coresMin: 1
-    coresMax: 2
 
 inputs:
   sample_id: string
