@@ -148,6 +148,13 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                     uuid=it['uuid'],
                     body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],
                           "properties": it["properties"]}).execute()
+            elif cr_state == 'Failed':
+                state[sample_id] = {
+                    'status': 'new',
+                    'container_request': None,
+                    'output_collection': None,
+        
+                }
         elif sample_state['status'] == 'complete':
             # TODO: do nothing
             pass
