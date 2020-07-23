@@ -18,7 +18,7 @@ inputs:
   reference:
     type: File
     inputBinding:
-      position: 2
+      position: 1
       prefix: '--ref'
     label: 'Reference genome. Supports FASTA, GenBank, EMBL (not GFF) (default '''')'
   dirs:
@@ -30,7 +30,7 @@ inputs:
     type: string?
     default: 'snps'
     inputBinding:
-      position: 2
+      position: 1
       prefix: '--inprefix'
 
 outputs:

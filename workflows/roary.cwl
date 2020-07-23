@@ -18,7 +18,7 @@ inputs:
   gff_files:
     type: File[]
     inputBinding:
-      position: 1
+      position: 2
   outdir:
     type: string?
     default: 'roary'
