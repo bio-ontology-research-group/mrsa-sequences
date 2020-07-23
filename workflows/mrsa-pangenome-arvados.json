@@ -2,11 +2,11 @@
     "gff_files": [
         {
             "class": "File",
-            "path": "keep:827bad91af534ac361e4004542ee4b9b+3163/prokka.gff",
+            "path": "keep:827bad91af534ac361e4004542ee4b9b+3163/MRSA094.gff",
         },
         {
             "class": "File",
-            "path": "keep:bd69251d9cf3573a25a809d97f4b60e0+3251/prokka.gff",
+            "path": "keep:bd69251d9cf3573a25a809d97f4b60e0+3251/MRSA093.gff",
         }],
     "reference": {
         "class": "File",
