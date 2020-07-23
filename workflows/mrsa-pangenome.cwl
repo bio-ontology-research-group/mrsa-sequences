@@ -10,6 +10,7 @@ inputs:
   dirs: Directory[]
   reference: File
   gff_files: File[]
+  snippy_inprefix: string
 outputs:
   pangenome:
     type: File
@@ -27,6 +28,7 @@ steps:
     in:
       dirs: dirs
       reference: reference
+      inprefix: snippy_inprefix
     out: [alignments,outputVcf]
     run: snippy-core.cwl
   iqTree:
