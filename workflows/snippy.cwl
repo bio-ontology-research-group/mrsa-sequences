@@ -9,8 +9,8 @@ requirements:
     dockerPull: 'quay.io/biocontainers/snippy:4.6.0--0'
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
-    ramMin: 15000 
-    coresMin: 1
+    ramMin: 16384 
+    coresMin: 2
 
 baseCommand: snippy
 
@@ -179,10 +179,11 @@ inputs:
     label: Maximum number of CPU cores to use (default '8')
   ram:
     type: float?
+    default: 16
     inputBinding:
       position: 3
       prefix: '--ram'
-    label: Try and keep RAM under this many GB (default '8')
+    label: Try and keep RAM under this many GB (default '16')
   tmp:
     type: Directory?
     inputBinding:
