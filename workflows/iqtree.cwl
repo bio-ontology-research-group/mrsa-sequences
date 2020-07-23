@@ -2,8 +2,6 @@
 cwlVersion: v1.0
 class: CommandLineTool
 
-s:license: http://www.apache.org/licenses/LICENSE-2.0
-
 requirements:
   InitialWorkDirRequirement:
     listing:

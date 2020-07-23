@@ -1,0 +1,26 @@
+{
+    "gff_files": [
+        {
+            "class": "File",
+            "path": "keep:827bad91af534ac361e4004542ee4b9b+3163/prokka.gff",
+        },
+        {
+            "class": "File",
+            "path": "keep:bd69251d9cf3573a25a809d97f4b60e0+3251/prokka.gff",
+        }],
+    "reference": {
+        "class": "File",
+        "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+    },
+    "dirs": [
+        {
+            "class": "Directory",
+            "path": "keep:827bad91af534ac361e4004542ee4b9b+3163/MRSA094"
+        },
+        {
+            "class": "Directory",
+            "path": "keep:bd69251d9cf3573a25a809d97f4b60e0+3251/MRSA093"
+        },
+    ]
+
+}
