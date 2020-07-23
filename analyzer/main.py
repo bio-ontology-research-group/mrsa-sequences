@@ -110,14 +110,14 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         state = json.loads(open('state.json').read())
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
     complete_cols = []
-    for it in reads:
+    for it in reads[1:]:
         col = api.collections().get(uuid=it['uuid']).execute()
         if 'sequence_label' not in it['properties']:
             continue
+        sample_id = it['properties']['sequence_label']
         if 'analysis_status' in it['properties']:
             complete_cols.append(col)
             continue
-        sample_id = it['properties']['sequence_label']
         if sample_id not in state:
             state[sample_id] = {
                 'status': 'new',
@@ -146,6 +146,9 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                 sample_state['status'] = 'complete'
                 # Copy output files to reads collection
                 it['properties']['analysis_status'] = 'complete'
+                mt = out_col['manifest_text'].replace('prokka.gff', f'{sample_id}.gff', 1)
+                mt = mt.replace('prokka.faa', f'{sample_id}.faa', 1)
+                out_col["manifest_text"] = mt
                 api.collections().update(
                     uuid=it['uuid'],
                     body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],

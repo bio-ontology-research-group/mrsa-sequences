@@ -90,6 +90,7 @@ steps:
       fa_file: skesa/contigs_out
       force:
         default: true
+      prefix: sample_id
     out: [faa_output, gff_output, out_directory]
     run: prokka.cwl
   mlst:
