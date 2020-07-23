@@ -109,11 +109,13 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
     if os.path.exists('state.json'):
         state = json.loads(open('state.json').read())
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
+    complete_cols = []
     for it in reads:
         col = api.collections().get(uuid=it['uuid']).execute()
         if 'sequence_label' not in it['properties']:
             continue
         if 'analysis_status' in it['properties']:
+            complete_cols.append(col)
             continue
         sample_id = it['properties']['sequence_label']
         if sample_id not in state:
