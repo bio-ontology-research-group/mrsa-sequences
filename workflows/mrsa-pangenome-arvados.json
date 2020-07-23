@@ -2,11 +2,11 @@
     "gff_files": [
         {
             "class": "File",
-            "path": "keep:a6c93782e8ccb819b260a69dbef4699c+3195/MRSA094.gff",
+            "location": "keep:a6c93782e8ccb819b260a69dbef4699c+3195/MRSA094.gff",
         },
         {
             "class": "File",
-            "path": "keep:b7002f708cc56ab3255f5bdb906bcc20+3253/MRSA093.gff",
+            "location": "keep:b7002f708cc56ab3255f5bdb906bcc20+3253/MRSA093.gff",
         }],
     "reference": {
         "class": "File",
@@ -15,11 +15,11 @@
     "dirs": [
         {
             "class": "Directory",
-            "path": "keep:a6c93782e8ccb819b260a69dbef4699c+3195/MRSA094"
+            "location": "keep:a6c93782e8ccb819b260a69dbef4699c+3195/MRSA094"
         },
         {
             "class": "Directory",
-            "path": "keep:b7002f708cc56ab3255f5bdb906bcc20+3253/MRSA093"
+            "location": "keep:b7002f708cc56ab3255f5bdb906bcc20+3253/MRSA093"
         },
     ],
     "snippy_inprefix": "snps"
