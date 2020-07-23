@@ -26,6 +26,12 @@ inputs:
     inputBinding:
       position: 2
     label: 'Output dirs from snippy'
+  inprefix:
+    type: string?
+    default: 'snps'
+    inputBinding:
+      position: 2
+      prefix: '--inprefix'
 
 outputs:
   alignments:
