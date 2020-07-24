@@ -6,11 +6,10 @@ cwlVersion: v1.0
 label: snippy-core
 requirements:
   - class: DockerRequirement
-    dockerPull: 'quay.io/biocontainers/snippy:4.6.0--0'
+    dockerPull: 'coolmaksat/snippy:latest'
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
-    coresMin: 1
-    coresMax: 2
+    coresMin: 16
 
 baseCommand: snippy-core
 
