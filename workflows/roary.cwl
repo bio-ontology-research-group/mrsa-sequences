@@ -6,7 +6,7 @@ class: CommandLineTool
 requirements:
   ResourceRequirement:
     ramMin: 8000
-    coresMin: 1
+    coresMin: 8
   InlineJavascriptRequirement: {}
   ScatterFeatureRequirement: {}
   DockerRequirement:
