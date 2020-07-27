@@ -96,12 +96,46 @@ def submit_new_request(
     return container_request, status
 
 
+def submit_pangenome(
+        api, workflows_project, pangenome_workflow_uuid, data):
+    inputobj = {
+        "gff_files": [],
+        "reference": {
+            "class": "File",
+            "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+        },
+        "dirs": [],
+    }
+    for s_id, pdh in data:
+        inputobj["gff_files"].append({
+            "class": "File",
+            "location": f'keep:{pdh}/{s_id}.gff'})
+        inputobj["dirs"].append({
+            "class": "Directory",
+            "location": f'keep:{pdh}/{s_id}'})
+    
+    name = f'Pangenome analysis for'
+    project, proc = run_workflow(
+        api, workflows_project, pangenome_workflow_uuid, name, inputobj)
+    status = 'error'
+    container_request = None
+    if proc.returncode != 0:
+        logging.error(proc.stderr.decode('utf-8'))
+    else:
+        output = proc.stderr.decode('utf-8')
+        lines = output.splitlines()
+        if lines[-2].find('container_request') != -1:
+            container_request = lines[-2].split()[-1]
+            status = 'submitted'
+    return container_request, status
+
+
     
 @ck.command()
 @ck.option('--fastq-project', '-fp', default='cborg-j7d0g-y651nepk74ziw3p', help='MRSA FASTQ sequences project uuid')
 @ck.option('--workflows-project', '-wp', default='cborg-j7d0g-lcux1tdrdshvul7', help='MRSA workflows project uuid')
 @ck.option('--metagenome-workflow-uuid', '-mwid', default='cborg-7fd4e-3ig4fl4bz90uydt', help='Metagenome workflow uuid')
-@ck.option('--pangenome-workflow-uuid', '-pwid', default='', help='Pangenome workflow uuid')
+@ck.option('--pangenome-workflow-uuid', '-pwid', default='cborg-7fd4e-qhxoc5ddgrti3tq', help='Pangenome workflow uuid')
 def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid):    
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
     col = arvados.collection.Collection(api_client=api)
@@ -109,14 +143,15 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
     if os.path.exists('state.json'):
         state = json.loads(open('state.json').read())
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
-    complete_cols = []
+    pangenome_data = []
+    update_pangenome = True
     for it in reads[1:]:
         col = api.collections().get(uuid=it['uuid']).execute()
         if 'sequence_label' not in it['properties']:
             continue
         sample_id = it['properties']['sequence_label']
         if 'analysis_status' in it['properties']:
-            complete_cols.append(col)
+            pangenome_data.append((sample_id, col['portable_data_hash']))
             continue
         if sample_id not in state:
             state[sample_id] = {
@@ -150,6 +185,8 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                     uuid=it['uuid'],
                     body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],
                           "properties": it["properties"]}).execute()
+                pangenome_data.append((sample_id, col['portable_data_hash']))
+                update_pangenome = True
             elif cr_state == 'Failed':
                 state[sample_id] = {
                     'status': 'new',
@@ -160,8 +197,14 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         elif sample_state['status'] == 'complete':
             # TODO: do nothing
             pass
+    if update_pangenome:
+        container_request, status = submit_pangenome(api, workflows_project, pangenome_workflow_uuid, pangenome_data)
+        if status == 'submitted':
+            state['last_pangenome_request'] = container_request
+            print('Submitted pangenome request', container_request)
     with open('state.json', 'w') as f:
         f.write(json.dumps(state))
+
 
 if __name__ == '__main__':
     main()
