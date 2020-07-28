@@ -8,8 +8,8 @@ requirements:
       - $(inputs.alignments)
 hints:
   ResourceRequirement:
-    coresMin: 8
-    ramMin: 30000
+    coresMin: 16
+    ramMin: 60000
   DockerRequirement:
     dockerPull: quay.io/biocontainers/iqtree:1.6.9--he860b03_1
 
@@ -17,9 +17,9 @@ baseCommand: iqtree
 
 arguments: 
  - prefix: -nt
-   valueFrom: AUTO
+   valueFrom: 16
  - prefix: -ntmax
-   valueFrom: $(runtime.cores)
+   valueFrom: 16
  - prefix: -seed
    valueFrom: "1"
 
