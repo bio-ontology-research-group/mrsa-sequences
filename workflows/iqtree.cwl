@@ -37,6 +37,7 @@ inputs:
 
   optimize_ufboot:
     type: boolean?
+    default: true
     doc: Optimize UFBoot trees by NNI on bootstrap alignment
     inputBinding:
       prefix: -bnni
