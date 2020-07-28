@@ -6,7 +6,6 @@ requirements:
   InitialWorkDirRequirement:
     listing:
       - $(inputs.alignments)
-hints:
   ResourceRequirement:
     coresMin: 16
     ramMin: 60000
