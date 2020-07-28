@@ -17,9 +17,9 @@ baseCommand: iqtree
 
 arguments: 
  - prefix: -nt
-   valueFrom: 16
+   valueFrom: "16"
  - prefix: -ntmax
-   valueFrom: 16
+   valueFrom: "16"
  - prefix: -seed
    valueFrom: "1"
 
