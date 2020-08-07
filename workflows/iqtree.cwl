@@ -21,6 +21,10 @@ arguments:
    valueFrom: "16"
  - prefix: -seed
    valueFrom: "1"
+ - prefix: -me
+   valueFrom: "0.05"
+ - prefix: -m
+   valueFrom: "GTR"
 
 # TODO: what about these options?
 # http://www.phylo.org/index.php/rest/iqtree_xsede.html
