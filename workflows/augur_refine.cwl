@@ -36,7 +36,7 @@ inputs:
     type: string?
     default: 'tree.nwk'
     inputBinding:
-      position:2
+      position: 2
       prefix: '--output-tree'
   output_node_data:
     type: string?
@@ -50,10 +50,13 @@ inputs:
     inputBinding:
       position: 2
       prefix: '--timetree'
-      
 
 outputs:
-  tree_out:
+  out_tree:
     type: File
     outputBinding:
-      glob: $(inputs.output)
+      glob: $(inputs.output_tree)
+  out_node_data:
+    type: File
+    outputBinding:
+      glob: $(inputs.output_node_data)
