@@ -28,8 +28,8 @@ inputs:
       position: 2
       prefix: '--metadata'
   columns:
-    type: string?
-    default: 'region country'
+    type: string[]?
+    default: ['region', 'country']
     inputBinding:
       position: 2
       prefix: '--columns'
