@@ -1,0 +1,14 @@
+{
+    "tree": {
+        "class": "File",
+        "path": "tree.nwk"
+    },
+    "ancestral": {
+        "class": "File",
+        "path": "nt_muts.json"
+    },
+    "reference": {
+        "class": "File",
+        "path": "/opt/data-mrsa/dbs/NC_007795.1.gb"
+    }    
+}

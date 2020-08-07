@@ -1,0 +1,10 @@
+{
+    "alignment": {
+        "class": "File",
+        "path": "alignment.fasta"
+    },
+    "tree": {
+        "class": "File",
+        "path": "tree.nwk"
+    }
+}

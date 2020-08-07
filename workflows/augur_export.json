@@ -1,0 +1,28 @@
+{
+    "tree": {
+        "class": "File",
+        "path": "tree.nwk"
+    },
+    "metadata": {
+        "class": "File",
+        "path": "metadata.tsv"
+    },
+    "node_data": [
+        {
+            "class": "File",
+            "path": "branch_lengths.json"
+        },
+        {
+            "class": "File",
+            "path": "traits.json"
+        },
+        {
+            "class": "File",
+            "path": "nt_muts.json"
+        },
+        {
+            "class": "File",
+            "path": "aa_muts.json"
+        }
+    ]
+}

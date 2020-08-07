@@ -1,0 +1,10 @@
+{
+    "tree": {
+        "class": "File",
+        "path": "tree.nwk"
+    },
+    "metadata": {
+        "class": "File",
+        "path": "metadata.tsv"
+    }
+}

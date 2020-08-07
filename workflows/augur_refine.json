@@ -1,0 +1,14 @@
+{
+    "alignment": {
+        "class": "File",
+        "path": "alignment.fasta"
+    },
+    "tree_raw": {
+        "class": "File",
+        "path": "tree_raw.nwk"
+    },
+    "metadata": {
+        "class": "File",
+        "path": "metadata.tsv"
+    }
+}

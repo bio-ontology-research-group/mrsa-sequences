@@ -26,7 +26,7 @@ inputs:
     type: File
     inputBinding:
       position: 1
-      prefix: '--ancestral-sequence'
+      prefix: '--ancestral-sequences'
   reference:
     type: File
     inputBinding:
