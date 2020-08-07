@@ -41,7 +41,6 @@ inputs:
       prefix: '--columns'
   confidence:
     type: boolean?
-    default: true
     inputBinding:
       position: 5
       prefix: '--confidence'
