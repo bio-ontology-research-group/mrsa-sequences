@@ -43,7 +43,7 @@ inputs:
     default: 'branch_lengths.json'
     inputBinding:
       position: 2
-      prefix:'--output-node-data'
+      prefix: '--output-node-data'
   timetree:
     type: boolean?
     default: true
