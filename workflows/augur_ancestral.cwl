@@ -32,7 +32,7 @@ inputs:
     default: 'nt_muts.json'
     inputBinding:
       position: 2
-      prefix: '--output'
+      prefix: '--output-node-data'
   inference:
     type: string?
     default: 'joint'
