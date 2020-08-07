@@ -12,7 +12,9 @@ requirements:
   DockerRequirement:
     dockerPull: quay.io/biocontainers/augur:7.0.2--py_0
 
-baseCommand: augur tree
+baseCommand: augur
+
+arguments: ["tree"]
 
 inputs:
   fasta:
