@@ -50,6 +50,30 @@ inputs:
     inputBinding:
       position: 2
       prefix: '--timetree'
+  coalescent:
+    type: string?
+    default: 'opt'
+    inputBinding:
+      position: 2
+      prefix: '--coalescent'
+  date_confidence:
+    type: boolean?
+    default: true
+    inputBinding:
+      position: 2
+      prefix: --date-confidence
+  date_inference:
+    type: string?
+    default: 'marginal'
+    inputBinding:
+      position: 2
+      prefix: --date-inference
+  clock_filter_iqd:
+    type: int?
+    default: 4
+    inputBinding:
+      position: 2
+      prefix: --clock-filter-iqd
 
 outputs:
   out_tree:
