@@ -20,30 +20,30 @@ inputs:
   tree:
     type: File
     inputBinding:
-      position: 2
+      position: 1
       prefix: '--tree'
   metadata:
     type: File
     inputBinding:
       position: 2
       prefix: '--metadata'
-  columns:
-    type: string[]?
-    default: ['region', 'country']
-    inputBinding:
-      position: 2
-      prefix: '--columns'
   output:
     type: string?
     default: 'traits.json'
     inputBinding:
-      position: 2
+      position: 3
       prefix: '--output'
+  columns:
+    type: string[]?
+    default: ['region', 'country']
+    inputBinding:
+      position: 4
+      prefix: '--columns'
   confidence:
     type: boolean?
     default: true
     inputBinding:
-      position: 2
+      position: 5
       prefix: '--confidence'
 
 outputs:
