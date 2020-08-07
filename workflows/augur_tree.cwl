@@ -17,7 +17,7 @@ baseCommand: augur
 arguments: ["tree"]
 
 inputs:
-  fasta:
+  alignment:
     type: File?
     inputBinding:
       position: 1
