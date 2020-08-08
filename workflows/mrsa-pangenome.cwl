@@ -73,5 +73,5 @@ steps:
     in:
       tree: augur_refine/out_tree
       metadata: metadata
-      node_data: [augur_refine/out_node_data,augur_traits/traits,augur_ancestral/nt_muts,augur_ancestral/aa_muts]
+      node_data: [augur_refine/out_node_data,augur_traits/traits,augur_ancestral/nt_muts,augur_translate/aa_muts]
     out: [out_file]
