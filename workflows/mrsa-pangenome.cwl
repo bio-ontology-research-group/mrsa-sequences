@@ -59,6 +59,7 @@ steps:
       tree: augur_refine/out_tree
       metadata: metadata
     out: [traits]
+    run: augur_traits.cwl
   augur_ancestral:
     in:
       tree: augur_refine/out_tree
