@@ -102,7 +102,15 @@ def submit_pangenome(
         "gff_files": [],
         "reference": {
             "class": "File",
-            "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+            "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.fasta"
+        },
+        "reference_gb": {
+            "class": "File",
+            "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.gb"
+        },
+        "metadata": {
+            "class": "File",
+            "location": "keep:e5c2e53119ea3aa1d0a2fd44de1d1a69+60/metadata.tsv"
         },
         "dirs": [],
     }

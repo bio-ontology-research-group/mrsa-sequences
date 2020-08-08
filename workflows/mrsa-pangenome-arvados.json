@@ -12,6 +12,10 @@
         "class": "File",
         "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
     },
+    "reference_gb": {
+        "class": "File",
+        "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.gb"
+    },
     "dirs": [
         {
             "class": "Directory",
@@ -22,5 +26,6 @@
             "location": "keep:b7002f708cc56ab3255f5bdb906bcc20+3253/MRSA093"
         },
     ],
-    "snippy_inprefix": "snps"
+    "snippy_inprefix": "snps",
+    ""
 }

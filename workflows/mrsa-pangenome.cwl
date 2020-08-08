@@ -1,4 +1,4 @@
-cwlVersion: v1.1
+AcwlVersion: v1.1
 class: Workflow
 requirements:
   ResourceRequirement:
@@ -9,8 +9,11 @@ requirements:
 inputs:
   dirs: Directory[]
   reference: File
+  reference_gb: File
   gff_files: File[]
   snippy_inprefix: string
+  metadata: File
+
 outputs:
   pangenome:
     type: File
@@ -21,7 +24,9 @@ outputs:
   iqtree:
     type: File
     outputSource: iqTree/report
-
+  augur:
+    type: File
+    outputSource: augur_export/out_file
 
 steps:
   snippyCore:
@@ -41,3 +46,32 @@ steps:
       gff_files: gff_files
     out: [gene_presence_absence,pangenome]
     run: roary.cwl
+  augur_refine:
+    in:
+      alignment: snippyCore/alignments
+      tree_raw: iqTree/result_tree
+      metadata: metadata
+    out:
+      [out_tree, out_node_data]
+  augur_traits:
+    in:
+      tree: augur_refine/out_tree
+      metadata: metadata
+    out: [traits]
+  augur_ancestral:
+    in:
+      tree: augur_refine/out_tree
+      alignment: snippyCore/alignments
+    out: [nt_muts]
+  augur_translate:
+    in:
+      tree: augur_refine/out_tree
+      ancestral: augur_ancestral/nt_muts
+      reference: reference_gb
+    out: [aa_muts]
+  augur_export:
+    in:
+      tree: augur_refine/out_tree
+      metadata: metadata
+      node_data: [augur_refine/out_node_data,augur_traits/traits,augur_ancestral/nt_muts,augur_ancestral/aa_muts]
+    out: [out_file]
