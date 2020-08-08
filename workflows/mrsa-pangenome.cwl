@@ -53,6 +53,7 @@ steps:
       metadata: metadata
     out:
       [out_tree, out_node_data]
+    run: augur_refine.cwl
   augur_traits:
     in:
       tree: augur_refine/out_tree
@@ -63,15 +64,18 @@ steps:
       tree: augur_refine/out_tree
       alignment: snippyCore/alignments
     out: [nt_muts]
+    run: augur_ancestral.cwl
   augur_translate:
     in:
       tree: augur_refine/out_tree
       ancestral: augur_ancestral/nt_muts
       reference: reference_gb
     out: [aa_muts]
+    run: augur_translate.cwl
   augur_export:
     in:
       tree: augur_refine/out_tree
       metadata: metadata
       node_data: [augur_refine/out_node_data,augur_traits/traits,augur_ancestral/nt_muts,augur_translate/aa_muts]
     out: [out_file]
+    augur_export.cwl
