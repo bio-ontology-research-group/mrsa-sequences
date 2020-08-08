@@ -1,4 +1,4 @@
-AcwlVersion: v1.1
+cwlVersion: v1.1
 class: Workflow
 requirements:
   ResourceRequirement:
