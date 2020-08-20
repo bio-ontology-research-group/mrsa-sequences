@@ -10,6 +10,10 @@ requirements:
     ramMin: 16000
   - class: DockerRequirement
     dockerPull: "coolmaksat/deepgoplus"
+  - class: InitialWorkDirRequirement
+    listing:
+      - entry: $(inputs.data_root)
+        writable: true
 
 baseCommand: deepgoplus
 
@@ -17,7 +21,7 @@ inputs:
   fasta:
     type: File
     inputBinding:
-      prefix: --input-file
+      prefix: --in-file
   data_root:
     type: Directory
     inputBinding:

@@ -1,10 +1,10 @@
 {
     "fasta": {
         "class": "File",
-        "path": "test.fa",
+        "path": "test.fa"
     },
     "data_root": {
-	"class": "Directory",
-	"path": "data/"
+        "class": "Directory",
+        "path": "/home/kulmanm/KAUST/CBRC/deepgoplus/data/"
     }
 }
