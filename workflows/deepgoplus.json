@@ -1,0 +1,10 @@
+{
+    "fasta": {
+        "class": "File",
+        "path": "test.fa",
+    },
+    "data_root": {
+	"class": "Directory",
+	"path": "data/"
+    }
+}
