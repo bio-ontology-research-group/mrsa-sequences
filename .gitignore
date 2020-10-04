@@ -21,3 +21,4 @@ data/
 state.json
 workflows/MRSA094/
 workflows/prokka/
+*~
