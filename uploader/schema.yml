@@ -9,6 +9,24 @@ $namespaces:
 
 $graph:
 
+- name: phenoSchema
+  type: record
+  fields:
+    susceptibility: susceptibilitySchema[]?
+
+- name: susceptibilytSchema
+  type: record
+  fields:
+    antimicrobial:
+        doc: Drug identifier, e.g. http://purl.obolibrary.org/obo/CHEBI_18208 for benzylpenicillin
+	type: string
+    mic:
+        doc: Minimum inhibitory concentration, e.g. NEG, value or <= value
+	type: string?
+    interpretation:
+        doc: S, R, +, *R
+	type: string?
+
 - name: hostSchema
   type: record
   fields:
@@ -233,6 +251,7 @@ $graph:
     bacteria: bacteriaSchema
     technology: technologySchema
     submitter: submitterSchema
+    phenotypes: phenoSchema
     id:
       doc: The subject (eg the fasta/fastq file) that the metadata describes
       type: string
