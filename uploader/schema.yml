@@ -17,15 +17,27 @@ $graph:
 - name: susceptibilytSchema
   type: record
   fields:
-    antimicrobial:
-        doc: Drug identifier, e.g. http://purl.obolibrary.org/obo/CHEBI_18208 for benzylpenicillin
+    antimicrobial_agent:
+        doc: Antimicrobial agent, e.g. http://purl.obolibrary.org/obo/CHEBI_18208 for benzylpenicillin
 	type: string
+	jsonldPredicate:
+	  _id: http://purl.obolibrary.org/obo/CHEBI_33281
+          _type: "@id"
+          noLinkCheck: true
     mic:
-        doc: Minimum inhibitory concentration, e.g. NEG, value or <= value
+        doc: Minimum inhibitory concentration, e.g. value or <= value
 	type: string?
+	jsonldPredicate:
+	  _id: http://purl.obolibrary.org/obo/OBI_0001514
+          _type: "@id"
+          noLinkCheck: true
     interpretation:
-        doc: S, R, +, *R
+        doc: Organismal quality, e. g. http://purl.obolibrary.org/obo/PATO_0001178 for resistant_to (R)
 	type: string?
+	jsonldPredicate:
+	  _id: http://purl.obolibrary.org/obo/PATO_0001995
+	  _type: "@id"
+	  noLinkCheck: true
 
 - name: hostSchema
   type: record
