@@ -19,16 +19,16 @@ $graph:
   fields:
     antimicrobial_agent:
         doc: Antimicrobial agent, e.g. http://purl.obolibrary.org/obo/CHEBI_18208 for benzylpenicillin
-	type: string
-	jsonldPredicate:
-	  _id: http://purl.obolibrary.org/obo/CHEBI_33281
+        type: string
+        jsonldPredicate:
+          _id: http://purl.obolibrary.org/obo/CHEBI_33281
           _type: "@id"
           noLinkCheck: true
     mic:
         doc: Minimum inhibitory concentration, e.g. value or <= value
-	type: string?
-	jsonldPredicate:
-	  _id: http://purl.obolibrary.org/obo/OBI_0001514
+        type: string?
+        jsonldPredicate:
+          _id: http://purl.obolibrary.org/obo/OBI_0001514
           _type: "@id"
           noLinkCheck: true
     interpretation:
