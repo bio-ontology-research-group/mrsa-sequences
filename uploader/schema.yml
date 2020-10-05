@@ -34,10 +34,10 @@ $graph:
     interpretation:
         doc: Organismal quality, e. g. http://purl.obolibrary.org/obo/PATO_0001178 for resistant_to (R)
         type: string?
-	jsonldPredicate:
-	  _id: http://purl.obolibrary.org/obo/PATO_0001995
-	  _type: "@id"
-	  noLinkCheck: true
+        jsonldPredicate:
+          _id: http://purl.obolibrary.org/obo/PATO_0001995
+          _type: "@id"
+          noLinkCheck: true
 
 - name: hostSchema
   type: record
