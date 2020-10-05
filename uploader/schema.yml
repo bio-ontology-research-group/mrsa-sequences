@@ -33,7 +33,7 @@ $graph:
           noLinkCheck: true
     interpretation:
         doc: Organismal quality, e. g. http://purl.obolibrary.org/obo/PATO_0001178 for resistant_to (R)
-	type: string?
+        type: string?
 	jsonldPredicate:
 	  _id: http://purl.obolibrary.org/obo/PATO_0001995
 	  _type: "@id"
