@@ -70,10 +70,10 @@ PREFIX wikidata: <http://www.wikidata.org/entity/>
 
 :susceptibilityShape {
     obo:CHEBI_33281 [ obo:CHEBI_~ ] ;
-    obo:OBI_0001514 xsd: string?;
-    obo:PATO_0001995 [ obo:PATO_0001178, obo:PATO_0000516 ]?;
+    obo:OBI_0001514 xsd:string ?;
+    obo:PATO_0001995 [ obo:PATO_0001178 obo:PATO_0000516 ] ?;
 }
 
 :phenotypesShape {
-    phenoSchema:susceptibility @:susceptibilityShape; 
+    phenoSchema:susceptibility @:susceptibilityShape+; 
 }

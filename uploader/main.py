@@ -9,6 +9,14 @@ import getpass
 import json
 import yaml
 import socket
+import pkg_resources
+import schema_salad.schema
+import schema_salad.ref_resolver
+import schema_salad.jsonld_context
+import traceback
+from rdflib import Graph, Namespace
+from pyshex.evaluate import evaluate
+import logging
 
 
 ARVADOS_API_HOST = os.environ.get('ARVADOS_API_HOST', 'cborg.cbrc.kaust.edu.sa')
@@ -29,13 +37,51 @@ def validate_fastq(fastq_file):
             pass
     return True
 
+def validate_metadata(metadata_file):
+    schema_resource = pkg_resources.resource_stream(__name__, "schema.yml")
+    cache = {
+        "https://raw.githubusercontent.com/bio-ontology-research-group/mrsa-sequences/master/uploader/schema.yml": schema_resource.read().decode("utf-8")}
+    (document_loader,
+     avsc_names,
+     schema_metadata,
+     metaschema_loader) = schema_salad.schema.load_schema(
+         "https://raw.githubusercontent.com/bio-ontology-research-group/mrsa-sequences/master/uploader/schema.yml",
+         cache=cache)
+
+    shex = pkg_resources.resource_stream(
+        __name__, "shex.rdf").read().decode("utf-8")
+
+    if not isinstance(avsc_names, schema_salad.avro.schema.Names):
+        print(avsc_names)
+        return False
+
+    try:
+        doc, metadata = schema_salad.schema.load_and_validate(
+            document_loader, avsc_names, metadata_file, True)
+        g = schema_salad.jsonld_context.makerdf("workflow", doc, document_loader.ctx)
+        rslt, reason = evaluate(
+            g, shex, doc["id"],
+            "https://raw.githubusercontent.com/bio-ontology-research-group/mrsa-sequences/master/uploader/shex.rdf#submissionShape")
+
+        if not rslt:
+            print(reason)
+
+        return rslt
+    except Exception as e:
+        traceback.print_exc()
+        logging.warn(e)
+    return False
 
 @ck.command()
-@ck.option('--uploader-project', default='cborg-j7d0g-y651nepk74ziw3p', help='MRSA FASTQ sequences project uuid')
+@ck.option(
+    '--uploader-project', default='cborg-j7d0g-y651nepk74ziw3p',
+    help='MRSA FASTQ sequences project uuid')
 @ck.option('--sequence-read1', '-sr1', help='Gzipped FASTQ File (*.fastq.gz) read 1')
 @ck.option('--sequence-read2', '-sr2', help='Gzipped FASTQ File (*.fastq.gz) read 2')
 @ck.option('--metadata-file', '-m', help='METADATA File')
 def main(uploader_project, sequence_read1, sequence_read2, metadata_file):
+    if not validate_metadata(metadata_file):
+        return
     metadata = yaml.load(open(metadata_file), Loader=yaml.FullLoader)
     validate_fastq(sequence_read1)
     validate_fastq(sequence_read2)

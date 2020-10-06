@@ -1,4 +1,4 @@
-$base: http://biohackathon.org/bh20-seq-schema
+$base: http://cbrc.kaust.edu.sa/mrsa-schema
 $namespaces:
   sch: https://schema.org/
   efo: http://www.ebi.ac.uk/efo/
@@ -9,12 +9,7 @@ $namespaces:
 
 $graph:
 
-- name: phenoSchema
-  type: record
-  fields:
-    susceptibility: susceptibilitySchema[]?
-
-- name: susceptibilytSchema
+- name: susceptibilitySchema
   type: record
   fields:
     antimicrobial_agent:
@@ -29,8 +24,6 @@ $graph:
         type: string?
         jsonldPredicate:
           _id: http://purl.obolibrary.org/obo/OBI_0001514
-          _type: "@id"
-          noLinkCheck: true
     interpretation:
         doc: Organismal quality, e. g. http://purl.obolibrary.org/obo/PATO_0001178 for resistant_to (R)
         type: string?
@@ -38,6 +31,11 @@ $graph:
           _id: http://purl.obolibrary.org/obo/PATO_0001995
           _type: "@id"
           noLinkCheck: true
+
+- name: phenoSchema
+  type: record
+  fields:
+    susceptibility: susceptibilitySchema[]?
 
 - name: hostSchema
   type: record
@@ -169,7 +167,7 @@ $graph:
           _type: "@id"
           noLinkCheck: true
     bacteria_strain:
-      doc: Name of the virus strain
+      doc: Name of the bacteria strain
       type: string?
       jsonldPredicate:
           _id: http://semanticscience.org/resource/SIO_010055
