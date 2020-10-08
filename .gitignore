@@ -10,6 +10,7 @@ workflows/*.vcf
 workflows/*.bai
 workflows/*.tab
 workflows/*.csv
+workflows/*.gfa
 workflows/*.bed
 workflows/*.gff
 workflows/*.faa

@@ -10,5 +10,5 @@
             "path": "/opt/data-mrsa/reads/MRSA001_R2.fastq.gz",
             "format": "edam:format_1930"
         }],
-    "contigs_out_name": "skesa_contigs.fa",
+    "contigs": {"class": "File", "path": "skesa_contigs.fa"},
 }

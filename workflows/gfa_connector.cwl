@@ -2,7 +2,7 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-baseCommand: skesa
+baseCommand: gfa_connector
 
 inputs:
   reads:
@@ -16,27 +16,35 @@ inputs:
     type: boolean?
     inputBinding:
       prefix: --use_paired_ends
-  contigs_out_name:
-    type: string?
-    default: contigs.out
+  contigs:
+    type: File?
     inputBinding:
-      prefix: --contigs_out
+      prefix: --contigs
+  gfa:
+    type: string?
+    default: skesa.gfa
+    inputBinding:
+      prefix: --gfa
+  csv:
+    type: string?
+    default: skesa.csv
+    inputBinding:
+      prefix: --csv
   cores:
     type: int?
-    default: 8
+    default: 0
     inputBinding:
       prefix: --cores
-  memory:
-    type: int?
-    default: 30
-    inputBinding:
-      prefix: --memory
 
 outputs:
-  contigs_out:
+  gfa_out:
     type: File
     outputBinding:
-      glob: $(inputs.contigs_out_name)
+      glob: $(inputs.gfa)
+  csv_out:
+    type: File
+    outputBinding:
+      glob: $(inputs.csv)
 
 requirements:
   - class: InlineJavascriptRequirement
