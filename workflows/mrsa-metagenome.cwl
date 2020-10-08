@@ -23,6 +23,9 @@ outputs:
   skesaContigs:
     type: File
     outputSource: skesa/contigs_out
+  skesaGFA:
+    type: File
+    outputSource: gfa_connector/gfa_out
   snippyVCF:
     type: File
     outputSource: snippy/vcf_output
@@ -70,11 +73,17 @@ steps:
     run: kraken2.cwl
   skesa:
     in:
-      fastq: [trimGalore/fastq1_trimmed, trimGalore/fastq2_trimmed]
+      reads: [trimGalore/fastq1_trimmed, trimGalore/fastq2_trimmed]
       contigs_out_name:
         default: "skesa_contigs.fa"
     out: [contigs_out]
     run: skesa.cwl
+  gfa_connector:
+    in:
+      reads: [trimGalore/fastq1_trimmed, trimGalore/fastq2_trimmed]
+      contigs: skesa/contigs_out
+    out: [gfa_out]
+    run: gfa_connector.cwl
   snippy:
     in:
       reference: snippy_ref
