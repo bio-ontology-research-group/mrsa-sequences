@@ -80,3 +80,25 @@ steps:
       node_data: [augur_refine/out_node_data,augur_traits/traits,augur_ancestral/nt_muts,augur_translate/aa_muts]
     out: [out_file]
     run: augur_export.cwl
+  overlapReads:
+    in: {readsFA: snippyCore/alignments}
+    out: [readsPAF]
+    run: minimap2.cwl
+  induceGraph:
+    in:
+      readsFA: snippyCore/alignments
+      readsPAF: overlapReads/readsPAF
+    out: [seqwishGFA]
+    run: seqwish.cwl
+  buildGraph:
+    in: {inputGFA: induceGraph/seqwishGFA}
+    out: [odgiGraph]
+    run: odgi-build.cwl
+  vizGraph:
+    in: {inputODGI: buildGraph/odgiGraph}
+    out: [odgiPNG]
+    run: odgi-viz.cwl
+  odgi2rdf:
+    in: {odgi: buildGraph/odgiGraph}
+    out: [odgiRDF]
+    run: odgi_to_rdf.cwl
