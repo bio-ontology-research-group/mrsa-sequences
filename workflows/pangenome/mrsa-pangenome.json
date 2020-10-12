@@ -12,6 +12,10 @@
         "class": "File",
         "path": "/opt/data-mrsa/dbs/NC_007795.1.fasta"
     },
+    "reference_gb": {
+        "class": "File",
+        "path": "/opt/data-mrsa/dbs/NC_007795.1.gb"
+    },
     "dirs": [
         {
             "class": "Directory",
@@ -21,6 +25,11 @@
             "class": "Directory",
             "path": "snippy1"
         },
-    ]
+    ],
+    "metadata": {
+        "class": "File",
+        "path": "metadata2.tsv"
+    },
+    "snippy_inprefix": "snps"
 
 }

@@ -15,19 +15,27 @@ inputs:
   metadata: File
 
 outputs:
+  alignment:
+    type: File
+    outputSource: snippyCore/alignments
   pangenome:
     type: File
     outputSource: roary/pangenome
   treefile:
     type: File
     outputSource: iqTree/result_tree
-  iqtree:
+  iqtree_report:
     type: File
     outputSource: iqTree/report
   augur:
     type: File
     outputSource: augur_export/out_file
-
+  gfa:
+    type: File
+    outputSource: induceGraph/seqwishGFA
+  odgi:
+    type: File
+    outputSource: vizGraph/odgiPNG 
 steps:
   snippyCore:
     in:
@@ -100,5 +108,5 @@ steps:
     run: odgi-viz.cwl
   odgi2rdf:
     in: {odgi: buildGraph/odgiGraph}
-    out: [odgiRDF]
+    out: [rdf]
     run: odgi_to_rdf.cwl

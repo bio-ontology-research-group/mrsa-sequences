@@ -1,14 +1,14 @@
 {
     "alignment": {
         "class": "File",
-        "path": "alignment.fasta"
+        "path": "core.full.aln"
     },
     "tree_raw": {
         "class": "File",
-        "path": "tree_raw.nwk"
+        "path": "core.full.aln.treefile"
     },
     "metadata": {
         "class": "File",
-        "path": "metadata.tsv"
+        "path": "metadata2.tsv"
     }
 }
