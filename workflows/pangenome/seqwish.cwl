@@ -3,9 +3,6 @@ class: CommandLineTool
 inputs:
   readsFA: File
   readsPAF: File
-  kmerSize:
-    type: int
-    default: 16
 outputs:
   seqwishGFA:
     type: File
@@ -17,13 +14,10 @@ hints:
   DockerRequirement:
     dockerPull: "quay.io/biocontainers/seqwish:0.4.1--h8b12597_0"
   ResourceRequirement:
-    coresMin: 4
-    ramMin: $(16 * 1024)
+    coresMin: 8
+    ramMin: $(32 * 1024)
     outdirMin: $(Math.ceil(inputs.readsFA.size/(1024*1024*1024) + 20))
-stdout: $(inputs.readsFA.nameroot).paf
 baseCommand: seqwish
-arguments: [-t, $(runtime.cores),
-            -k, $(inputs.kmerSize),
-            -s, $(inputs.readsFA),
+arguments: [-s, $(inputs.readsFA),
             -p, $(inputs.readsPAF),
             -g, $(inputs.readsPAF.nameroot).gfa]
