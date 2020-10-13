@@ -1,23 +1,38 @@
-cwlVersion: v1.1
+#!/usr/bin/env cwl-runner
+cwlVersion: v1.0
+
 class: CommandLineTool
-inputs:
-  readsFA: File
-  readsPAF: File
-outputs:
-  seqwishGFA:
-    type: File
-    outputBinding:
-      glob: $(inputs.readsPAF.nameroot).gfa
+
 requirements:
   InlineJavascriptRequirement: {}
-hints:
   DockerRequirement:
     dockerPull: "quay.io/biocontainers/seqwish:0.4.1--h8b12597_0"
   ResourceRequirement:
     coresMin: 8
-    ramMin: $(32 * 1024)
-    outdirMin: $(Math.ceil(inputs.readsFA.size/(1024*1024*1024) + 20))
+    ramMin: 24000
+
 baseCommand: seqwish
-arguments: [-s, $(inputs.readsFA),
-            -p, $(inputs.readsPAF),
-            -g, $(inputs.readsPAF.nameroot).gfa]
+
+inputs:
+  readsFA:
+    type: File
+    inputBinding:
+      position: 1
+      prefix: "-s"
+  readsPAF:
+    type: File
+    inputBinding:
+      position: 2
+      prefix: "-p"
+  gfa_name:
+    type: string?
+    default: seqwish.gfa
+    inputBinding:
+      position: 3
+      prefix: "-g"
+
+outputs:
+  seqwishGFA:
+    type: File
+    outputBinding:
+      glob: $(inputs.gfa_name)
