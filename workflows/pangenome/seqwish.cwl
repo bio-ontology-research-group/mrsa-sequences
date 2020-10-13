@@ -18,7 +18,7 @@ hints:
     dockerPull: "quay.io/biocontainers/seqwish:0.4.1--h8b12597_0"
   ResourceRequirement:
     coresMin: 4
-    ramMin: $(7 * 1024)
+    ramMin: $(16 * 1024)
     outdirMin: $(Math.ceil(inputs.readsFA.size/(1024*1024*1024) + 20))
 stdout: $(inputs.readsFA.nameroot).paf
 baseCommand: seqwish

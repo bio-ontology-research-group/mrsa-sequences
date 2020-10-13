@@ -1,0 +1,4 @@
+{
+    "readsFA": {"class": "File", "path": "core.full.aln"},
+    "readsPAF": {"class": "File", "path": "core.full.paf"}
+}
