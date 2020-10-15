@@ -31,6 +31,7 @@ pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycurl==7.43.0.5
 pyparsing==2.4.7
+pyshex==0.7.14
 python-dateutil==2.8.1
 PyYAML==5.3.1
 rdflib==4.2.2
