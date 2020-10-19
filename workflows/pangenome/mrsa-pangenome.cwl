@@ -106,7 +106,3 @@ steps:
     in: {inputODGI: buildGraph/odgiGraph}
     out: [odgiPNG]
     run: odgi-viz.cwl
-  odgi2rdf:
-    in: {odgi: buildGraph/odgiGraph}
-    out: [rdf]
-    run: odgi_to_rdf.cwl
