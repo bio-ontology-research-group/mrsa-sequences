@@ -1,0 +1,1847 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>MRSA Sequences</title>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Optional theme -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Datatables -->
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- Graphing library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+
+    <style>
+      
+#pan SVG {
+  width: 100%;
+  height: auto;
+  font-family: sans-serif;
+}
+
+H1 {
+  text-align: center;
+}
+
+.nullarbor-section {
+  border-top: 0.66ex dotted DarkGray;
+  margin-top: 4ex;
+  width: auto;
+}
+
+A.jump-home {
+  font-size: smaller;
+}
+
+TT {
+  font-size: smaller;
+}
+
+/*
+TD:first-child {
+  font-family: monospace;
+  font-size: smaller;
+}
+*/
+
+TABLE {
+/*  font-size: smaller; */
+/*   width: auto; */
+}
+
+A.file-download {
+  font-family: monospace;
+  padding-left: 1ex;
+//  background: lightgray;
+//  border: 1pt dotted gray;
+}
+
+UL.pagination {
+  font-size: smaller;
+}
+
+TH {
+  background: LightGrey;
+  color: Black;
+}
+
+TH, TD {
+  text-align: center;
+}
+
+/* for vertical TH elements */
+DIV.vertical {
+  white-space: nowrap;
+  /* try different ways to make it vertical */
+  -webkit-writing-mode: vertical-rl; 
+  -ms-writing-mode: tb-rl; 
+  writing-mode: vertical-rl; 
+  filter: flipv fliph; 
+  /* make it centered */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.binomial {
+  text-align: left;
+  font-family: serif;
+  font-style: italic;
+}
+
+.traffic-light {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.pass {
+  color: green;
+}
+
+.fail {
+  color: red;
+}
+
+.dunno {
+  color: orange;
+}
+
+.dunno:hover {
+  cursor: help;
+}
+
+.allele {
+  font-style: italic;
+}
+
+.missing {
+  color: red;
+  font-weight: bold;
+}
+
+.novel {
+  color: orange;
+}
+
+.known {
+  
+}
+
+SPAN.legend {
+  font-size: larger;
+  border: 1px dotted black;
+  padding: 1ex;
+}
+
+SPAN.legend-item {
+  padding-left: 3ex;
+}
+    </style>
+  </head>
+  <body>
+
+<!--
+<nav class='navbar navbar-inverse navbar-static-top'>
+  <div class='container'>
+    <p class='navbar-brand'>
+Nullarbor
+    </p>
+    <p class='navbar-text navbar-right'>Torsten Seemann</p>
+  </div>
+</nav>
+-->
+
+<div class='container-fluid'>
+<h1>MRSA Sequences</h1>
+<div class='container-fluid nullarbor-section' id='jobinfo'>
+  <a name='jobinfo'></a>
+  <h2> {% include "menu.html" %} Report summary <a href='#'
+                                                   class='jump-home'>&#x25B2;</a> </h2>
+  <table id='jobinfo' class='table table-bordered table-condensed'>
+    <thead>
+      <tr>
+        <th>Isolates
+        <th>Author
+        <th>Date
+        <th>Host
+        <th>Folder
+    </thead>
+    <tbody>
+      <tr>
+        <td>23
+        <td><tt>tseemann</tt>
+        <td>Mon Sep 10 17:33:05 2018
+        <td><tt>526080-s598783.unimelb.edu.au</tt>
+        <td><tt>/home/tseemann/git/snippy/Tuna_Scrape/nullarbor</tt>
+    </tbody>
+    <caption>
+      <span class='file-download-bar'>Download: <a href='jobinfo.csv'
+                                                                  class='file-download'>&#11015;jobinfo.csv</a></span>
+    </caption>
+  </table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='seqdata'>
+  <a name='seqdata'></a>
+  <h2>{% include "menu.html" %}
+    Sequence data <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+
+  <SPAN CLASS='legend'>
+    <B>Legend:</B>
+    <SPAN CLASS='legend-item'>
+      <span class='traffic-light pass' title='&ge;50x'>&#10004;</span> &ge;50x
+    </SPAN>
+    <SPAN CLASS='legend-item'>
+      <span class='traffic-light dunno' title='&ge;25x'>?</span>
+      &ge;25x
+    </SPAN>
+    <SPAN CLASS='legend-item'>
+      <span class='traffic-light fail' title='&lt;25x'>&#10008;</span> &lt;25x
+    </SPAN>
+  </SPAN>
+
+  <table id='seqdata' class='display compact table-sortable'>
+    <thead>
+      <tr>
+        <th>Isolate</th>
+        <th>Reads</th>
+        <th>Yield</th>
+        <th>GeeCee</th>
+        <th>MinLen</th>
+        <th>AvgLen</th>
+        <th>MaxLen</th>
+        <th>ModeLen</th>
+        <th>Phred</th>
+        <th>AvgQual</th>
+        <th>Depth</th>
+        <th>Quality</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CFSAN000952</td>
+        <td>1900502</td>
+        <td>286975802</td>
+        <td>52.9</td>
+        <td>151</td>
+        <td>151</td>
+        <td>151</td>
+        <td>151</td>
+        <td>33</td>
+        <td>28.2</td>
+        <td>58</td>
+        <td><span class='traffic-light pass'>&#10004;</span></td>
+      </tr>
+    </tbody>
+    <caption>
+      <span class='file-download-bar'>Download:  <a href='seqdata.csv' class='file-download'>&#11015;seqdata.csv</a></span>
+    </caption>
+  </table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='identification'>
+  <a name='identification'></a>
+  <h2>{% include "menu.html" %}
+    Species identification <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+  <SPAN CLASS='legend'>
+    <B>Legend:</B>
+    <SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;80%'>&#10004;</span> &ge;80%</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&ge;65%'>?</span> &ge;65%</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light fail' title='&lt;65%'>&#10008;</span> &lt;65%</SPAN>
+  </SPAN>
+
+  <table id='identification' class='display compact table-sortable'>
+    <thead>
+      <tr>
+        <th>Isolate
+        <th>#1 Match
+        <th>%
+        <th>#2 Match
+        <th>%
+        <th>#3 Match
+        <th>%
+        <th>#4 Match
+        <th>%
+        <th>Quality
+    </thead>
+    <tbody>
+      <tr>
+        <td>CFSAN000952
+        <td><SPAN STYLE='color: black; font-weight: bold;'><span class='binomial'>Salmonella enterica</span></SPAN>
+        <td><SPAN STYLE='color: black; font-weight: bold;'>89.68</SPAN>
+        <td><SPAN STYLE='color: gray;'><span class='binomial'>unclassified</span></SPAN>
+        <td><SPAN STYLE='color: gray;'>5.65</SPAN>
+        <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Staphylococcus aureus</span></SPAN>
+        <td><SPAN STYLE='color: lightgray;'>0.08</SPAN>
+        <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Salmonella bongori</span></SPAN>
+        <td><SPAN STYLE='color: lightgray;'>0.01</SPAN>
+        <td><span class='traffic-light pass'>&#10004;</span>
+          <tr>
+            <td>CFSAN000211
+            <td><SPAN STYLE='color: black; font-weight: bold;'><span class='binomial'>Salmonella enterica</span></SPAN>
+            <td><SPAN STYLE='color: black; font-weight: bold;'>95.48</SPAN>
+            <td><SPAN STYLE='color: gray;'><span class='binomial'>unclassified</span></SPAN>
+            <td><SPAN STYLE='color: gray;'>1.55</SPAN>
+            <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Salmonella bongori</span></SPAN>
+            <td><SPAN STYLE='color: lightgray;'>0.01</SPAN>
+            <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Escherichia coli</span></SPAN>
+            <td><SPAN STYLE='color: lightgray;'>0.01</SPAN>
+            <td><span class='traffic-light pass'>&#10004;</span>
+    </tbody><caption><span class='file-download-bar'>Download:  <a href='identification.csv' class='file-download'>&#11015;identification.csv</a></span>
+    </caption>
+  </table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='mlst'>
+  <a name='mlst'></a>
+  <h2>{% include "menu.html" %}
+    MLST <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+  <table id='mlst' class='display compact table-sortable'>
+    <thead>
+      <tr>
+        <th>Isolate
+        <th>Scheme
+        <th>Sequence<BR>Type
+        <th>Allele
+        <th>Allele
+        <th>Allele
+        <th>Allele
+        <th>Allele
+        <th>Allele
+        <th>Allele
+        <th>Quality
+    </thead>
+    <tbody>
+      <tr>
+        <td>Reference
+        <td>senterica
+        <td>909
+        <td><SPAN CLASS='allele known'>aroC(81)</SPAN>
+        <td><SPAN CLASS='allele known'>dnaN(283)</SPAN>
+        <td><SPAN CLASS='allele known'>hemD(101)</SPAN>
+        <td><SPAN CLASS='allele known'>hisD(12)</SPAN>
+        <td><SPAN CLASS='allele known'>purE(124)</SPAN>
+        <td><SPAN CLASS='allele known'>sucA(130)</SPAN>
+        <td><SPAN CLASS='allele known'>thrA(17)</SPAN>
+        <td><span class='traffic-light pass'>&#10004;</span>
+          <tr>
+    </tbody><caption><span class='file-download-bar'>Download:  <a href='mlst.csv' class='file-download'>&#11015;mlst.csv</a></span>
+    </caption>
+  </table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='resistome'>
+<a name='resistome'></a>
+<h2>{% include "menu.html" %}
+Resistome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<SPAN CLASS='legend'>
+<B>Legend:</B>
+<SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;95% coverage'>&#10004;</span> &ge;95% coverage</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='<95% coverage'>?</span> <95% coverage</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light fail' title='absent'>&#10008;</span> absent</SPAN>
+</SPAN>
+
+<table id='resistome' class='display compact table-sortable'>
+<thead>
+<tr>
+<th>Isolate
+<th>Found
+</thead>
+<tbody>
+<tr>
+<td>CFSAN000952
+<td>0
+</tbody><caption><span class='file-download-bar'>Download:  <a href='resistome.csv' class='file-download'>&#11015;resistome.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='virulome'>
+<a name='virulome'></a>
+<h2>{% include "menu.html" %}
+Virulome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<SPAN CLASS='legend'>
+<B>Legend:</B>
+<SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;95% coverage'>&#10004;</span> &ge;95% coverage</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='<95% coverage'>?</span> <95% coverage</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light fail' title='. absent'>&#10008;</span> . absent</SPAN>
+</SPAN>
+
+<table id='virulome' class='display compact table-sortable'>
+<thead>
+<tr>
+<th>Isolate
+<th>Found
+<th><DIV CLASS='vertical'>avrA</DIV>
+<th><DIV CLASS='vertical'>cheA</DIV>
+<th><DIV CLASS='vertical'>cheD</DIV>
+<th><DIV CLASS='vertical'>cheW</DIV>
+<th><DIV CLASS='vertical'>cheY</DIV>
+<th><DIV CLASS='vertical'>csgA</DIV>
+<th><DIV CLASS='vertical'>csgB</DIV>
+<th><DIV CLASS='vertical'>csgC</DIV>
+<th><DIV CLASS='vertical'>csgD</DIV>
+<th><DIV CLASS='vertical'>csgE</DIV>
+<th><DIV CLASS='vertical'>csgF</DIV>
+<th><DIV CLASS='vertical'>csgG</DIV>
+<th><DIV CLASS='vertical'>entA</DIV>
+<th><DIV CLASS='vertical'>entB</DIV>
+<th><DIV CLASS='vertical'>entC</DIV>
+<th><DIV CLASS='vertical'>entE</DIV>
+<th><DIV CLASS='vertical'>entS</DIV>
+<th><DIV CLASS='vertical'>faeC</DIV>
+<th><DIV CLASS='vertical'>faeD</DIV>
+<th><DIV CLASS='vertical'>faeE</DIV>
+<th><DIV CLASS='vertical'>faeF</DIV>
+<th><DIV CLASS='vertical'>faeH</DIV>
+<th><DIV CLASS='vertical'>fepA</DIV>
+<th><DIV CLASS='vertical'>fepB</DIV>
+<th><DIV CLASS='vertical'>fepC</DIV>
+<th><DIV CLASS='vertical'>fepD</DIV>
+<th><DIV CLASS='vertical'>fepG</DIV>
+<th><DIV CLASS='vertical'>fimC</DIV>
+<th><DIV CLASS='vertical'>fimD</DIV>
+<th><DIV CLASS='vertical'>fimF</DIV>
+<th><DIV CLASS='vertical'>fimH</DIV>
+<th><DIV CLASS='vertical'>fimI</DIV>
+<th><DIV CLASS='vertical'>flgE</DIV>
+<th><DIV CLASS='vertical'>flgG</DIV>
+<th><DIV CLASS='vertical'>flgH</DIV>
+<th><DIV CLASS='vertical'>flhC</DIV>
+<th><DIV CLASS='vertical'>fliA</DIV>
+<th><DIV CLASS='vertical'>fliC</DIV>
+<th><DIV CLASS='vertical'>fliG</DIV>
+<th><DIV CLASS='vertical'>fliM</DIV>
+<th><DIV CLASS='vertical'>fliN</DIV>
+<th><DIV CLASS='vertical'>fliP</DIV>
+<th><DIV CLASS='vertical'>gmhA/lpcA</DIV>
+<th><DIV CLASS='vertical'>gogB</DIV>
+<th><DIV CLASS='vertical'>gtrA</DIV>
+<th><DIV CLASS='vertical'>gtrB</DIV>
+<th><DIV CLASS='vertical'>invA</DIV>
+<th><DIV CLASS='vertical'>invB</DIV>
+<th><DIV CLASS='vertical'>invC</DIV>
+<th><DIV CLASS='vertical'>invE</DIV>
+<th><DIV CLASS='vertical'>invF</DIV>
+<th><DIV CLASS='vertical'>invG</DIV>
+<th><DIV CLASS='vertical'>invH</DIV>
+<th><DIV CLASS='vertical'>invI</DIV>
+<th><DIV CLASS='vertical'>invJ</DIV>
+<th><DIV CLASS='vertical'>iroB</DIV>
+<th><DIV CLASS='vertical'>iroC</DIV>
+<th><DIV CLASS='vertical'>iroN</DIV>
+<th><DIV CLASS='vertical'>lpfA</DIV>
+<th><DIV CLASS='vertical'>lpfB</DIV>
+<th><DIV CLASS='vertical'>lpfC</DIV>
+<th><DIV CLASS='vertical'>lpfD</DIV>
+<th><DIV CLASS='vertical'>lpfE</DIV>
+<th><DIV CLASS='vertical'>manB</DIV>
+<th><DIV CLASS='vertical'>mgtB</DIV>
+<th><DIV CLASS='vertical'>mgtC</DIV>
+<th><DIV CLASS='vertical'>mig-14</DIV>
+<th><DIV CLASS='vertical'>misL</DIV>
+<th><DIV CLASS='vertical'>ompA</DIV>
+<th><DIV CLASS='vertical'>orgA</DIV>
+<th><DIV CLASS='vertical'>orgB</DIV>
+<th><DIV CLASS='vertical'>orgC</DIV>
+<th><DIV CLASS='vertical'>pipB</DIV>
+<th><DIV CLASS='vertical'>pipB2</DIV>
+<th><DIV CLASS='vertical'>prgH</DIV>
+<th><DIV CLASS='vertical'>prgI</DIV>
+<th><DIV CLASS='vertical'>prgJ</DIV>
+<th><DIV CLASS='vertical'>prgK</DIV>
+<th><DIV CLASS='vertical'>ratB</DIV>
+<th><DIV CLASS='vertical'>shdA</DIV>
+<th><DIV CLASS='vertical'>sicA</DIV>
+<th><DIV CLASS='vertical'>sicP</DIV>
+<th><DIV CLASS='vertical'>sifA</DIV>
+<th><DIV CLASS='vertical'>sifB</DIV>
+<th><DIV CLASS='vertical'>sinH</DIV>
+<th><DIV CLASS='vertical'>sipA/sspA</DIV>
+<th><DIV CLASS='vertical'>sipB/sspB</DIV>
+<th><DIV CLASS='vertical'>sipC/sspC</DIV>
+<th><DIV CLASS='vertical'>sipD</DIV>
+<th><DIV CLASS='vertical'>slrP</DIV>
+<th><DIV CLASS='vertical'>sopA</DIV>
+<th><DIV CLASS='vertical'>sopB/sigD</DIV>
+<th><DIV CLASS='vertical'>sopD</DIV>
+<th><DIV CLASS='vertical'>sopD2</DIV>
+<th><DIV CLASS='vertical'>sopE2</DIV>
+<th><DIV CLASS='vertical'>spaO</DIV>
+<th><DIV CLASS='vertical'>spaP</DIV>
+<th><DIV CLASS='vertical'>spaQ</DIV>
+<th><DIV CLASS='vertical'>spaR</DIV>
+<th><DIV CLASS='vertical'>spaS</DIV>
+<th><DIV CLASS='vertical'>spiC/ssaB</DIV>
+<th><DIV CLASS='vertical'>sptP</DIV>
+<th><DIV CLASS='vertical'>ssaC</DIV>
+<th><DIV CLASS='vertical'>ssaD</DIV>
+<th><DIV CLASS='vertical'>ssaE</DIV>
+<th><DIV CLASS='vertical'>ssaG</DIV>
+<th><DIV CLASS='vertical'>ssaH</DIV>
+<th><DIV CLASS='vertical'>ssaI</DIV>
+<th><DIV CLASS='vertical'>ssaJ</DIV>
+<th><DIV CLASS='vertical'>ssaK</DIV>
+<th><DIV CLASS='vertical'>ssaL</DIV>
+<th><DIV CLASS='vertical'>ssaM</DIV>
+<th><DIV CLASS='vertical'>ssaN</DIV>
+<th><DIV CLASS='vertical'>ssaO</DIV>
+<th><DIV CLASS='vertical'>ssaP</DIV>
+<th><DIV CLASS='vertical'>ssaQ</DIV>
+<th><DIV CLASS='vertical'>ssaR</DIV>
+<th><DIV CLASS='vertical'>ssaS</DIV>
+<th><DIV CLASS='vertical'>ssaT</DIV>
+<th><DIV CLASS='vertical'>ssaU</DIV>
+<th><DIV CLASS='vertical'>ssaV</DIV>
+<th><DIV CLASS='vertical'>sscA</DIV>
+<th><DIV CLASS='vertical'>sscB</DIV>
+<th><DIV CLASS='vertical'>sseA</DIV>
+<th><DIV CLASS='vertical'>sseB</DIV>
+<th><DIV CLASS='vertical'>sseC</DIV>
+<th><DIV CLASS='vertical'>sseD</DIV>
+<th><DIV CLASS='vertical'>sseE</DIV>
+<th><DIV CLASS='vertical'>sseF</DIV>
+<th><DIV CLASS='vertical'>sseG</DIV>
+<th><DIV CLASS='vertical'>sseJ</DIV>
+<th><DIV CLASS='vertical'>sseK1</DIV>
+<th><DIV CLASS='vertical'>sseK2</DIV>
+<th><DIV CLASS='vertical'>sseL</DIV>
+<th><DIV CLASS='vertical'>sspH2</DIV>
+<th><DIV CLASS='vertical'>steA</DIV>
+<th><DIV CLASS='vertical'>steB</DIV>
+<th><DIV CLASS='vertical'>steC</DIV>
+</thead>
+<tbody>
+<tr>
+<td>CFSAN000952
+<td>136
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='16% + 18%'>?</span>
+<td><span class='traffic-light dunno' title='8% + 41%'>?</span>
+<td><span class='traffic-light dunno' title='91%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='91%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='91%'>?</span>
+<td><span class='traffic-light dunno' title='86%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='90%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='91%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='31%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='80%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='19% + 34% + 19% + 32%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='62%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='70%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td>.
+<td><span class='traffic-light dunno' title='14%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td>.
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light dunno' title='100% + 1%'>?</span>
+<td><span class='traffic-light dunno' title='59%'>?</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+<td><span class='traffic-light pass'>&#10004;</span>
+</tbody><caption><span class='file-download-bar'>Download:  <a href='virulome.csv' class='file-download'>&#11015;virulome.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='assembly'>
+<a name='assembly'></a>
+<h2>{% include "menu.html" %}
+Assembly and annotation <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<SPAN CLASS='legend'>
+<B>Legend:</B>
+<SPAN CLASS='legend-item'><span class='traffic-light pass' title='Typical'>&#10004;</span> Typical</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&mu;<SUB>Contigs</SUB>=57 &and; &mu;<SUB>bp</SUB>=4753003'>?</span> &mu;<SUB>Contigs</SUB>=57 &and; &mu;<SUB>bp</SUB>=4753003</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light fail' title='Contigs &gt; 1.5&mu; &or; bp &plusmn; 0.2&mu;'>&#10008;</span> Contigs &gt; 1.5&mu; &or; bp &plusmn; 0.2&mu;</SPAN>
+
+</SPAN>
+<table id='assembly' class='display compact table-sortable'>
+<thead>
+<tr>
+<th>Isolate
+<th>Contigs
+<th>bp
+<th>ok
+<th>Ns
+<th>gaps
+<th>min
+<th>avg
+<th>max
+<th>N50
+<th>CDS
+<th>rRNA
+<th>tRNA
+<th>tmRNA
+<th>Quality
+</thead>
+<tbody>
+<tr>
+<td>CFSAN000189
+<td>29
+<td>4759947
+<td>4759947
+<td>0
+<td>0
+<td>518
+<td>164136
+<td>645633
+<td>313057
+<td>4432
+<td>4
+<td>68
+<td>1
+<td><span class='traffic-light pass'>&#10004;</span>
+</tbody><caption><span class='file-download-bar'>Download:  <a href='assembly.csv' class='file-download'>&#11015;assembly.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='reference'>
+<a name='reference'></a>
+<h2>{% include "menu.html" %}
+Reference genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<table id='reference' class='display compact table-sortable'>
+<thead>
+<tr>
+<th>Sequence
+<th>Length
+<th>Description
+</thead>
+<tbody>
+<tr>
+<td>CP006053
+<td>4730612
+<td>CP006053 Salmonella enterica subsp. enterica serovar Bareilly str. CFSAN000189, complete genome.
+<tr>
+<td>CP006054
+<td>78193
+<td>CP006054 Salmonella enterica subsp. enterica serovar Bareilly str. CFSAN000189 plasmid unnamed, complete sequence.
+<tr>
+<td>TOTAL
+<td>4808805
+<td>Total reference size in bp
+</tbody><caption><span class='file-download-bar'>Download:  <a href='reference.csv' class='file-download'>&#11015;reference.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='core'>
+<a name='core'></a>
+<h2>{% include "menu.html" %}
+Core genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<SPAN CLASS='legend'>
+<B>Legend:</B>
+<SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;90% used'>&#10004;</span> &ge;90% used</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&ge;70% used'>?</span> &ge;70% used</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light fail' title='<70% used'>&#10008;</span> <70% used</SPAN>
+
+</SPAN>
+<table id='core' class='display compact table-sortable'>
+<thead>
+<tr>
+<th>Isolate
+<th>LENGTH
+<th>ALIGNED
+<th>UNALIGNED
+<th>VARIANT
+<th>HET
+<th>MASKED
+<th>LOWCOV
+<th>%Used
+<th>Quality
+</thead>
+<tbody>
+<tr>
+<td>CFSAN000189
+<td>4808805
+<td>4750050
+<td>56530
+<td>5
+<td>39
+<td>0
+<td>2186
+<td>98.78
+<td><span class='traffic-light pass'>&#10004;</span>
+</tbody><caption><span class='file-download-bar'>Download:  <a href='core.csv' class='file-download'>&#11015;core.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='phylotree'>
+<a name='phylotree'></a>
+<h2>{% include "menu.html" %}
+Core SNP Phylogeny <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<div style="text-align: center;">23 taxa, 138 SNPs</div>
+<div id="phylocanvas" style="width: 100%; height: 322pt;">
+<script type="application/javascript" src="https://cdn.rawgit.com/phylocanvas/phylocanvas-quickstart/v2.8.1/phylocanvas-quickstart.js"></script>
+<script type="application/javascript">
+var tree = Phylocanvas.createTree('phylocanvas', {
+  showInternalNodeLabels: true,
+  alignLabels: true,
+  lineWidth: 2,
+  scalebar: { active: true, position: { bottom: 10, centre: 10 } },
+});  
+tree.internalLabelStyle.colour = 'green';
+tree.on('error', function (event) { throw event.error; });
+tree.on('loaded', function () { console.log('loaded phylocanvas'); });
+tree.on('beforeFirstDraw', function () {
+  tree.metadata.headerAngle = 60;
+  tree.metadata.columns = [ 'ST', 'AMR' ];
+  tree.leaves[0].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[1].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[3].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[4].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[2].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[5].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[18].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[19].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[9].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[7].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[16].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[17].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[20].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[6].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[21].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[11].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[12].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[13].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[15].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[10].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[8].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[14].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[22].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[23].data = { 
+    ST: { label: '909', colour: 'white' },
+    AMR: { label: '-', colour: 'white' },
+  };
+  tree.leaves[23].labelStyle.format = 'bold';
+});
+tree.load('(CFSAN000189:0.0000020665,(((CFSAN000191:0.1707412424,CFSAN000228:0.0694680500)73.3_65:0.0610850322,(CFSAN000211:0.0000027775,CFSAN000212:0.0071355327)97.5_100:0.3567236154)100_100:0.8838710137,((((((((((((((((CFSAN000661:0.0000000000,CFSAN000958:0.0000000000):0.0000000000,CFSAN000753:0.0000000000):0.0000000000,CFSAN001115:0.0000000000):0.0000000000,CFSAN000752:0.0000000000):0.0000000000,CFSAN001112:0.0000000000):0.0000000000,CFSAN000961:0.0000000000):0.0000000000,CFSAN000963:0.0000000000):0.0000000000,CFSAN000968:0.0000000000):0.0000000000,CFSAN001118:0.0000000000):0.0000000000,CFSAN000970:0.0000000000):0.0000000000,CFSAN000951:0.0000000000):0.0000000000,CFSAN000952:0.0000000000):0.0000027775,CFSAN000669:0.0000027775)0_74:0.0000023337,(CFSAN000700:0.0073015317,CFSAN000954:0.0073015294)0_25:0.0000025778)0_17:0.0000021494,CFSAN000960:0.0073461444)83.1_71:0.0073732154,CFSAN001140:0.0000020985)89.4_99:0.1149764215)0_59:0.0000020215,Reference:0.0411130501);');
+tree.setTreeType('rectangular');
+tree.setTextSize(14);
+tree.setNodeSize(4);
+tree.draw();
+
+</script>
+</div>
+<span class='file-download-bar'>Download:  <a href='core.newick' class='file-download'>&#11015;core.newick</a></span>
+</div>
+
+<div class='container-fluid nullarbor-section' id='snpdist'>
+<a name='snpdist'></a>
+<h2>{% include "menu.html" %}
+Pairwise core SNP distances <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+
+<div id='snpdist-histogram'>
+</div>
+<script>
+var nums = [ 54,55,27,89,89,90,89,89,89,89,90,89,90,89,89,89,89,89,89,89,88,85,1,45,91,91,92,91,91,91,91,92,91,92,91,91,91,91,91,91,91,90,87,46,92,92,93,92,92,92,92,93,92,93,92,92,92,92,92,92,92,91,88,80,80,81,80,80,80,80,81,80,81,80,80,80,80,80,80,80,79,76,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,20,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,20,1,1,1,1,2,1,2,1,1,1,1,1,1,1,2,21,0,0,0,1,0,1,0,0,0,0,0,0,0,1,20,0,0,1,0,1,0,0,0,0,0,0,0,1,20,0,1,0,1,0,0,0,0,0,0,0,1,20,1,0,1,0,0,0,0,0,0,0,1,20,1,2,1,1,1,1,1,1,1,2,21,1,0,0,0,0,0,0,0,1,20,1,1,1,1,1,1,1,2,21,0,0,0,0,0,0,1,20,0,0,0,0,0,1,20,0,0,0,0,1,20,0,0,0,1,20,0,0,1,20,0,1,20,1,20,19 ];
+var data = [ { 
+  type: 'histogram',
+  x: nums, 
+  autobinx: false,
+  xbins: { start: 0, end: 93, size: 1 },
+} ];
+var layout = {
+  title: 'Pairwise core SNP distance histogram',
+  xaxis: { title: 'SNP distance' },
+  yaxis: { title: 'Frequency' },
+};
+Plotly.newPlot('snpdist-histogram', data, layout);
+</script>
+<table id='snpdist' class='display compact table-sortable'>
+<thead>
+<tr>
+<th>
+<th><div class='vertical'>CFSAN000189</div>
+<th><div class='vertical'>CFSAN000191</div>
+<th><div class='vertical'>CFSAN000211</div>
+<th><div class='vertical'>CFSAN000212</div>
+<th><div class='vertical'>CFSAN000228</div>
+<th><div class='vertical'>CFSAN000661</div>
+<th><div class='vertical'>CFSAN000669</div>
+<th><div class='vertical'>CFSAN000700</div>
+<th><div class='vertical'>CFSAN000752</div>
+<th><div class='vertical'>CFSAN000753</div>
+<th><div class='vertical'>CFSAN000951</div>
+<th><div class='vertical'>CFSAN000952</div>
+<th><div class='vertical'>CFSAN000954</div>
+<th><div class='vertical'>CFSAN000958</div>
+<th><div class='vertical'>CFSAN000960</div>
+<th><div class='vertical'>CFSAN000961</div>
+<th><div class='vertical'>CFSAN000963</div>
+<th><div class='vertical'>CFSAN000968</div>
+<th><div class='vertical'>CFSAN000970</div>
+<th><div class='vertical'>CFSAN001112</div>
+<th><div class='vertical'>CFSAN001115</div>
+<th><div class='vertical'>CFSAN001118</div>
+<th><div class='vertical'>CFSAN001140</div>
+<th><div class='vertical'>Reference</div>
+</thead>
+<tbody>
+<tr>
+<td>CFSAN000189
+<td>0
+<td>80
+<td>82
+<td>83
+<td>71
+<td>15
+<td>15
+<td>16
+<td>15
+<td>15
+<td>15
+<td>15
+<td>16
+<td>15
+<td>16
+<td>15
+<td>15
+<td>15
+<td>15
+<td>15
+<td>15
+<td>15
+<td>14
+<td>5
+<tr>
+<td>CFSAN000191
+<td>80
+<td>0
+<td>54
+<td>55
+<td>27
+<td>89
+<td>89
+<td>90
+<td>89
+<td>89
+<td>89
+<td>89
+<td>90
+<td>89
+<td>90
+<td>89
+<td>89
+<td>89
+<td>89
+<td>89
+<td>89
+<td>89
+<td>88
+<td>85
+<tr>
+<td>CFSAN000211
+<td>82
+<td>54
+<td>0
+<td>1
+<td>45
+<td>91
+<td>91
+<td>92
+<td>91
+<td>91
+<td>91
+<td>91
+<td>92
+<td>91
+<td>92
+<td>91
+<td>91
+<td>91
+<td>91
+<td>91
+<td>91
+<td>91
+<td>90
+<td>87
+<tr>
+<td>CFSAN000212
+<td>83
+<td>55
+<td>1
+<td>0
+<td>46
+<td>92
+<td>92
+<td>93
+<td>92
+<td>92
+<td>92
+<td>92
+<td>93
+<td>92
+<td>93
+<td>92
+<td>92
+<td>92
+<td>92
+<td>92
+<td>92
+<td>92
+<td>91
+<td>88
+<tr>
+<td>CFSAN000228
+<td>71
+<td>27
+<td>45
+<td>46
+<td>0
+<td>80
+<td>80
+<td>81
+<td>80
+<td>80
+<td>80
+<td>80
+<td>81
+<td>80
+<td>81
+<td>80
+<td>80
+<td>80
+<td>80
+<td>80
+<td>80
+<td>80
+<td>79
+<td>76
+<tr>
+<td>CFSAN000661
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000669
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000700
+<td>16
+<td>90
+<td>92
+<td>93
+<td>81
+<td>1
+<td>1
+<td>0
+<td>1
+<td>1
+<td>1
+<td>1
+<td>2
+<td>1
+<td>2
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>2
+<td>21
+<tr>
+<td>CFSAN000752
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000753
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000951
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000952
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000954
+<td>16
+<td>90
+<td>92
+<td>93
+<td>81
+<td>1
+<td>1
+<td>2
+<td>1
+<td>1
+<td>1
+<td>1
+<td>0
+<td>1
+<td>2
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>2
+<td>21
+<tr>
+<td>CFSAN000958
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000960
+<td>16
+<td>90
+<td>92
+<td>93
+<td>81
+<td>1
+<td>1
+<td>2
+<td>1
+<td>1
+<td>1
+<td>1
+<td>2
+<td>1
+<td>0
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>2
+<td>21
+<tr>
+<td>CFSAN000961
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000963
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000968
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN000970
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN001112
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN001115
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN001118
+<td>15
+<td>89
+<td>91
+<td>92
+<td>80
+<td>0
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>0
+<td>1
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>0
+<td>1
+<td>20
+<tr>
+<td>CFSAN001140
+<td>14
+<td>88
+<td>90
+<td>91
+<td>79
+<td>1
+<td>1
+<td>2
+<td>1
+<td>1
+<td>1
+<td>1
+<td>2
+<td>1
+<td>2
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>1
+<td>0
+<td>19
+<tr>
+<td>Reference
+<td>5
+<td>85
+<td>87
+<td>88
+<td>76
+<td>20
+<td>20
+<td>21
+<td>20
+<td>20
+<td>20
+<td>20
+<td>21
+<td>20
+<td>21
+<td>20
+<td>20
+<td>20
+<td>20
+<td>20
+<td>20
+<td>20
+<td>19
+<td>0
+</tbody><caption><span class='file-download-bar'>Download:  <a href='snpdist.csv' class='file-download'>&#11015;snpdist.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='snpdensity'>
+<a name='snpdensity'></a>
+<h2>{% include "menu.html" %}
+Core SNP density <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+
+<div id='snpdensity-histogram'>
+</div>
+<script>
+var nums = [ 115714,147186,190695,221363,222020,268434,309014,309657,351109,388919,432510,446060,464220,465176,476531,694650,704733,718062,733360,878241,905220,912619,923276,967467,1015763,1030248,1059978,1076268,1179395,1189914,1190541,1233305,1273696,1279248,1316753,1317771,1338972,1372881,1410442,1477062,1501503,1598998,1598999,1599000,1599002,1599003,1600370,1605352,1605483,1625798,1626011,1663837,1684749,1772510,1827978,1864060,1886151,1951156,1973429,1981427,2045923,2049977,2063323,2117089,2138539,2149430,2186376,2338280,2343189,2347353,2355963,2413415,2461670,2582583,2632351,2640466,2670947,2671074,2675746,2676641,2828112,2830783,2849335,2873458,2972040,3020371,3031897,3035764,3049370,3062994,3064123,3099320,3100282,3109307,3123614,3131401,3147245,3156924,3165412,3212866,3240014,3254748,3279654,3378315,3410835,3455786,3457068,3494480,3498776,3563229,3611090,3692597,3737503,3783558,3914835,3984427,3988607,3990551,4085764,4101031,4124394,4152047,4173667,4200049,4204834,4230608,4236579,4244984,4327861,4331351,4382734,4388162,4414258,4485329,4599214,4605293,4660311,4708247 ];
+var data = [ { 
+  type: 'histogram',
+  x: nums, 
+//  autobinx: false,
+//  xbins: { start: 0, end: 4708247, size: 1 },
+} ];
+var layout = {
+  title: '138 SNPs across 4808805 bp',
+  xaxis: { title: 'Genome position' },
+  yaxis: { title: 'SNPs' },
+};
+Plotly.newPlot('snpdensity-histogram', data, layout);
+</script>
+</div><div class='container-fluid nullarbor-section' id='pan'>
+<a name='pan'></a>
+<h2>{% include "menu.html" %}
+Pan genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<p class='container-fluid'>
+</p>
+<table id='pan' class='table table-bordered table-condensed'>
+<thead>
+<tr>
+<th>Ortholog class
+<th>Definition
+<th>Count
+</thead>
+<tbody>
+<tr>
+<td>Core genes
+<td>(99% <= strains <= 100%)
+<td>4277
+<tr>
+<td>Soft core genes
+<td>(95% <= strains < 99%)
+<td>50
+<tr>
+<td>Shell genes
+<td>(15% <= strains < 95%)
+<td>163
+<tr>
+<td>Cloud genes
+<td>(0% <= strains < 15%)
+<td>286
+<tr>
+<td>Total genes
+<td>(0% <= strains <= 100%)
+<td>4776
+</tbody><caption><span class='file-download-bar'>Download:  <a href='pan.csv' class='file-download'>&#11015;pan.csv</a></span>
+</caption>
+</table>
+<p class='container-fluid'>
+<svg viewBox="0 0 1024 392" width='1024' height='392' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' ><defs><style type='text/css'><![CDATA[
+ .leaf-label {font-size:12;font-family:sans-serif;}
+ .inner-label {opacity:0}
+ .edge-label {opacity:0}
+]]></style></defs>
+<!-- arguments: -S -s -w 1024 -l font-size:12;font-family:sans-serif; -i opacity:0 -b opacity:0 -v 16 roary/accessory_binary_genes.fa.newick  -->
+<g transform='translate(0,20)'><g  style='stroke:black;fill:none;stroke-width:1;stroke-linecap:round'><line class='clade_0' x1='17.9128' y1='0.0000' x2='45.4750' y2='0.0000'/><line class='clade_0' x1='17.9128' y1='16.0000' x2='20.4000' y2='16.0000'/><line class='clade_0' x1='17.9128' y1='0.0000' x2='17.9128' y2='16.0000'/><line class='clade_0' x1='15.4200' y1='8.0000' x2='17.9128' y2='8.0000'/><line class='clade_0' x1='30.2899' y1='32.0000' x2='45.4504' y2='32.0000'/><line class='clade_0' x1='883.1411' y1='48.0000' x2='911.1746' y2='48.0000'/><line class='clade_0' x1='892.9711' y1='64.0000' x2='895.5482' y2='64.0000'/><line class='clade_0' x1='892.9711' y1='80.0000' x2='926.0000' y2='80.0000'/><line class='clade_0' x1='892.9711' y1='64.0000' x2='892.9711' y2='80.0000'/><line class='clade_0' x1='883.1411' y1='72.0000' x2='892.9711' y2='72.0000'/><line class='clade_0' x1='883.1411' y1='48.0000' x2='883.1411' y2='72.0000'/><line class='clade_0' x1='875.4109' y1='60.0000' x2='883.1411' y2='60.0000'/><line class='clade_0' x1='875.4109' y1='96.0000' x2='879.9366' y2='96.0000'/><line class='clade_0' x1='875.4109' y1='60.0000' x2='875.4109' y2='96.0000'/><line class='clade_0' x1='30.2899' y1='78.0000' x2='875.4109' y2='78.0000'/><line class='clade_0' x1='30.2899' y1='112.0000' x2='39.8018' y2='112.0000'/><line class='clade_0' x1='30.2899' y1='78.0000' x2='30.2899' y2='112.0000'/><line class='clade_0' x1='30.2899' y1='95.0000' x2='30.2899' y2='95.0000'/><line class='clade_0' x1='30.2899' y1='32.0000' x2='30.2899' y2='95.0000'/><line class='clade_0' x1='24.4510' y1='63.5000' x2='30.2899' y2='63.5000'/><line class='clade_0' x1='35.7334' y1='128.0000' x2='47.3750' y2='128.0000'/><line class='clade_0' x1='46.8786' y1='144.0000' x2='75.5443' y2='144.0000'/><line class='clade_0' x1='46.8786' y1='160.0000' x2='59.1163' y2='160.0000'/><line class='clade_0' x1='46.8786' y1='144.0000' x2='46.8786' y2='160.0000'/><line class='clade_0' x1='35.7334' y1='152.0000' x2='46.8786' y2='152.0000'/><line class='clade_0' x1='35.7334' y1='128.0000' x2='35.7334' y2='152.0000'/><line class='clade_0' x1='24.4510' y1='140.0000' x2='35.7334' y2='140.0000'/><line class='clade_0' x1='24.4510' y1='63.5000' x2='24.4510' y2='140.0000'/><line class='clade_0' x1='15.4200' y1='101.7500' x2='24.4510' y2='101.7500'/><line class='clade_0' x1='15.4200' y1='8.0000' x2='15.4200' y2='101.7500'/><line class='clade_0' x1='10.0000' y1='54.8750' x2='15.4200' y2='54.8750'/><line class='clade_0' x1='18.0797' y1='176.0000' x2='45.9040' y2='176.0000'/><line class='clade_0' x1='55.4131' y1='192.0000' x2='85.0390' y2='192.0000'/><line class='clade_0' x1='55.4131' y1='208.0000' x2='88.1334' y2='208.0000'/><line class='clade_0' x1='55.4131' y1='192.0000' x2='55.4131' y2='208.0000'/><line class='clade_0' x1='38.5825' y1='200.0000' x2='55.4131' y2='200.0000'/><line class='clade_0' x1='38.5825' y1='224.0000' x2='56.3593' y2='224.0000'/><line class='clade_0' x1='38.5825' y1='200.0000' x2='38.5825' y2='224.0000'/><line class='clade_0' x1='33.6742' y1='212.0000' x2='38.5825' y2='212.0000'/><line class='clade_0' x1='39.1932' y1='240.0000' x2='83.8020' y2='240.0000'/><line class='clade_0' x1='56.5621' y1='256.0000' x2='133.2806' y2='256.0000'/><line class='clade_0' x1='56.5621' y1='272.0000' x2='82.6313' y2='272.0000'/><line class='clade_0' x1='56.5621' y1='256.0000' x2='56.5621' y2='272.0000'/><line class='clade_0' x1='39.1932' y1='264.0000' x2='56.5621' y2='264.0000'/><line class='clade_0' x1='39.1932' y1='240.0000' x2='39.1932' y2='264.0000'/><line class='clade_0' x1='33.6742' y1='252.0000' x2='39.1932' y2='252.0000'/><line class='clade_0' x1='33.6742' y1='212.0000' x2='33.6742' y2='252.0000'/><line class='clade_0' x1='18.0797' y1='232.0000' x2='33.6742' y2='232.0000'/><line class='clade_0' x1='18.0797' y1='176.0000' x2='18.0797' y2='232.0000'/><line class='clade_0' x1='10.0000' y1='204.0000' x2='18.0797' y2='204.0000'/><line class='clade_0' x1='13.1297' y1='288.0000' x2='26.6623' y2='288.0000'/><line class='clade_0' x1='28.6610' y1='304.0000' x2='70.7474' y2='304.0000'/><line class='clade_0' x1='35.1767' y1='320.0000' x2='88.3673' y2='320.0000'/><line class='clade_0' x1='49.6886' y1='336.0000' x2='73.0935' y2='336.0000'/><line class='clade_0' x1='49.6886' y1='352.0000' x2='78.4195' y2='352.0000'/><line class='clade_0' x1='49.6886' y1='336.0000' x2='49.6886' y2='352.0000'/><line class='clade_0' x1='35.1767' y1='344.0000' x2='49.6886' y2='344.0000'/><line class='clade_0' x1='35.1767' y1='320.0000' x2='35.1767' y2='344.0000'/><line class='clade_0' x1='28.6610' y1='332.0000' x2='35.1767' y2='332.0000'/><line class='clade_0' x1='28.6610' y1='304.0000' x2='28.6610' y2='332.0000'/><line class='clade_0' x1='13.1297' y1='318.0000' x2='28.6610' y2='318.0000'/><line class='clade_0' x1='13.1297' y1='288.0000' x2='13.1297' y2='318.0000'/><line class='clade_0' x1='10.0000' y1='303.0000' x2='13.1297' y2='303.0000'/><line class='clade_0' x1='10.0000' y1='54.8750' x2='10.0000' y2='303.0000'/><line x1='0' y1='178.9375' x2='10.0000' y2='178.9375'/></g><g style='stroke:none'><text class='leaf-label' x='55.4750' y='4.0000'>CFSAN000952</text><text class='edge-label' x='31.693876' y='-4.000000'>0.068305302</text><text class='leaf-label' x='30.4000' y='20.0000'>CFSAN000961</text><text class='edge-label' x='19.156380' y='12.000000'>0.006163780</text><text class='inner-label' x='27.9128' y='12.0000'>0.262</text><text class='edge-label' x='16.666418' y='4.000000'>0.006177599</text><text class='leaf-label' x='55.4504' y='36.0000'>CFSAN000669</text><text class='edge-label' x='37.870138' y='28.000000'>0.037571296</text><text class='leaf-label' x='921.1746' y='52.0000'>CFSAN000191</text><text class='edge-label' x='897.157843' y='44.000000'>0.069473239</text><text class='leaf-label' x='905.5482' y='68.0000'>CFSAN000211</text><text class='edge-label' x='894.259641' y='60.000000'>0.006386759</text><text class='leaf-label' x='936.0000' y='84.0000'>CFSAN000212</text><text class='edge-label' x='909.485533' y='76.000000'>0.081853195</text><text class='inner-label' x='902.9711' y='76.0000'>0.561</text><text class='edge-label' x='888.056094' y='68.000000'>0.024360837</text><text class='inner-label' x='893.1411' y='64.0000'>0.708</text><text class='edge-label' x='879.276020' y='56.000000'>0.019157199</text><text class='leaf-label' x='889.9366' y='100.0000'>CFSAN000228</text><text class='edge-label' x='877.673765' y='92.000000'>0.011215699</text><text class='inner-label' x='885.4109' y='82.0000'>1.000</text><text class='edge-label' x='452.850390' y='74.000000'>2.094401846</text><text class='leaf-label' x='49.8018' y='116.0000'>CFSAN000753</text><text class='edge-label' x='35.045808' y='108.000000'>0.023572625</text><text class='inner-label' x='40.2899' y='99.0000'>0.014</text><text class='edge-label' x='30.289862' y='91.000000'>0.000000005</text><text class='inner-label' x='40.2899' y='67.5000'>0.351</text><text class='edge-label' x='27.370412' y='59.500000'>0.014470114</text><text class='leaf-label' x='57.3750' y='132.0000'>CFSAN000189</text><text class='edge-label' x='41.554198' y='124.000000'>0.028850331</text><text class='leaf-label' x='85.5443' y='148.0000'>CFSAN000951</text><text class='edge-label' x='61.211462' y='140.000000'>0.071039937</text><text class='leaf-label' x='69.1163' y='164.0000'>CFSAN000960</text><text class='edge-label' x='52.997463' y='156.000000'>0.030327628</text><text class='inner-label' x='56.8786' y='156.0000'>0.781</text><text class='edge-label' x='41.306043' y='148.000000'>0.027620360</text><text class='inner-label' x='45.7334' y='144.0000'>0.834</text><text class='edge-label' x='30.092201' y='136.000000'>0.027960535</text><text class='inner-label' x='34.4510' y='105.7500'>0.870</text><text class='edge-label' x='19.935503' y='97.750000'>0.022380668</text><text class='inner-label' x='25.4200' y='58.8750'>0.857</text><text class='edge-label' x='12.710022' y='50.875000'>0.013432099</text><text class='leaf-label' x='55.9040' y='180.0000'>CFSAN001112</text><text class='edge-label' x='31.991855' y='172.000000'>0.068954783</text><text class='leaf-label' x='95.0390' y='196.0000'>CFSAN000700</text><text class='edge-label' x='70.226039' y='188.000000'>0.073419651</text><text class='leaf-label' x='98.1334' y='212.0000'>CFSAN000954</text><text class='edge-label' x='71.773234' y='204.000000'>0.081088251</text><text class='inner-label' x='65.4131' y='204.0000'>0.851</text><text class='edge-label' x='46.997782' y='196.000000'>0.041710138</text><text class='leaf-label' x='66.3593' y='228.0000'>CFSAN001115</text><text class='edge-label' x='47.470903' y='220.000000'>0.044055140</text><text class='inner-label' x='48.5825' y='216.0000'>0.564</text><text class='edge-label' x='36.128355' y='208.000000'>0.012163679</text><text class='leaf-label' x='93.8020' y='244.0000'>CFSAN000661</text><text class='edge-label' x='61.497596' y='236.000000'>0.110550872</text><text class='leaf-label' x='143.2806' y='260.0000'>CFSAN001118</text><text class='edge-label' x='94.921351' y='252.000000'>0.190125900</text><text class='leaf-label' x='92.6313' y='276.0000'>CFSAN001140</text><text class='edge-label' x='69.596680' y='268.000000'>0.064605330</text><text class='inner-label' x='66.5621' y='268.0000'>0.892</text><text class='edge-label' x='47.877631' y='260.000000'>0.043044140</text><text class='inner-label' x='49.1932' y='256.0000'>0.304</text><text class='edge-label' x='36.433707' y='248.000000'>0.013677143</text><text class='inner-label' x='43.6742' y='236.0000'>0.926</text><text class='edge-label' x='25.876990' y='228.000000'>0.038646739</text><text class='inner-label' x='28.0797' y='208.0000'>0.868</text><text class='edge-label' x='14.039867' y='200.000000'>0.020023417</text><text class='leaf-label' x='36.6623' y='292.0000'>CFSAN000958</text><text class='edge-label' x='19.896007' y='284.000000'>0.033536900</text><text class='leaf-label' x='80.7474' y='308.0000'>CFSAN000968</text><text class='edge-label' x='49.704207' y='300.000000'>0.104299478</text><text class='leaf-label' x='98.3673' y='324.0000'>CFSAN000970</text><text class='edge-label' x='61.772005' y='316.000000'>0.131818493</text><text class='leaf-label' x='83.0935' y='340.0000'>CFSAN000752</text><text class='edge-label' x='61.391049' y='332.000000'>0.058002648</text><text class='leaf-label' x='88.4195' y='356.0000'>CFSAN000963</text><text class='edge-label' x='64.054064' y='348.000000'>0.071201757</text><text class='inner-label' x='59.6886' y='348.0000'>0.324</text><text class='edge-label' x='42.432642' y='340.000000'>0.035963827</text><text class='inner-label' x='45.1767' y='336.0000'>0.150</text><text class='edge-label' x='31.918863' y='328.000000'>0.016147235</text><text class='inner-label' x='38.6610' y='322.0000'>0.931</text><text class='edge-label' x='20.895371' y='314.000000'>0.038490198</text><text class='inner-label' x='23.1297' y='307.0000'>0.764</text><text class='edge-label' x='11.564849' y='299.000000'>0.007756103</text></g></g></svg>
+
+</p>
+</div>
+
+<div class='container-fluid nullarbor-section' id='tools'>
+<a name='tools'></a>
+<h2><span class='dropdown'>
+<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>&#9776;</button>
+<ul class='dropdown-menu'><li><a href='#jobinfo'>Report summary</a>
+<li><a href='#seqdata'>Sequence data</a>
+<li><a href='#identification'>Species identification</a>
+<li><a href='#mlst'>MLST</a>
+<li><a href='#resistome'>Resistome</a>
+<li><a href='#virulome'>Virulome</a>
+<li><a href='#assembly'>Assembly and annotation</a>
+<li><a href='#reference'>Reference genome</a>
+<li><a href='#core'>Core genome</a>
+<li><a href='#phylotree'>Core SNP Phylogeny</a>
+<li><a href='#snpdist'>Pairwise core SNP distances</a>
+<li><a href='#snpdensity'>Core SNP density</a>
+<li><a href='#pan'>Pan genome</a>
+<li><a href='#tools'>Software versions</a>
+<li><a href='#databases'>Databases</a>
+<li><a href='#about'>About</a>
+</ul></span>
+Software versions <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<table id='tools' class='table table-bordered table-condensed'>
+<thead>
+<tr>
+<th>Tool
+<th>Version
+</thead>
+<tbody>
+<tr>
+<td>Abricate
+<td>0.8.7
+<tr>
+<td>BWA MEM
+<td>0.7.17-r1188
+<tr>
+<td>FastTree
+<td>2.1.10 Double precision (No SSE3), OpenMP (72 threads):
+<tr>
+<td>FreeBayes
+<td>1.2.0-dirty
+<tr>
+<td>IQtree
+<td>1.6.5 for Linux 64-bit built May 11 2018
+<tr>
+<td>Kraken
+<td>1.0
+<tr>
+<td>MLST
+<td>2.15.1
+<tr>
+<td>MegaHit
+<td>1.1.3
+<tr>
+<td>Newick-Utils
+<td>1.6
+<tr>
+<td>Nullarbor
+<td>2.0.20180909
+<tr>
+<td>Prokka
+<td>1.13.3
+<tr>
+<td>Roary
+<td>3.12.0
+<tr>
+<td>SAMtools
+<td>1.9
+<tr>
+<td>SKESA
+<td>2.2
+<tr>
+<td>SPAdes
+<td>3.12.0
+<tr>
+<td>Shovill
+<td>1.0.1
+<tr>
+<td>Snippy
+<td>4.1.1
+<tr>
+<td>Trimmomatic
+<td>0.38
+<tr>
+<td>centrifuge
+<td>1.0.3-beta
+<tr>
+<td>seqret
+<td>6.6.0.0
+<tr>
+<td>seqtk
+<td>1.3-r106
+<tr>
+<td>snp-dists
+<td>0.6
+</tbody><caption><span class='file-download-bar'>Download:  <a href='tools.csv' class='file-download'>&#11015;tools.csv</a></span>
+</caption>
+</table>
+</div>
+
+<div class='container-fluid nullarbor-section' id='databases'>
+<a name='databases'></a>
+<h2>{% include "menu.html" %}
+Databases <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+<table id='databases' class='table table-bordered table-condensed'>
+<thead>
+<tr>
+<th>Database
+<th>Name
+<th>Date
+</thead>
+<tbody>
+<tr>
+<td>Kraken
+<td>minikraken_20171019_8GB
+<td>2017-10-20
+<tr>
+<td>mlst
+<td>mlst.fa
+<td>2018-09-10
+</tbody><caption><span class='file-download-bar'>Download:  <a href='databases.csv' class='file-download'>&#11015;databases.csv</a></span>
+</caption>
+</table>
+</div><div class='container-fluid nullarbor-section' id='about'>
+<a name='about'></a>
+<h2>{% include "menu.html" %}
+About <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+
+<ul class='list-unstyled'>
+<li>This primary author of Nullarbor is <a href="http://tseemann.github.io/">Torsten Seemann</a>.
+<li>You can download the software from <a href="https://github.com/tseemann/nullarbor">Github</a>.
+<li>Please report bugs at the <a href="https://github.com/tseemann/nullarbor/issues">Nullarbor Issue Tracker</a>.
+<li>If you use Nullarbor please use the <a href="https://github.com/tseemann/nullarbor/#citation">latest citation</a>.
+</ul>
+  </div></div>
+ 
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Datatables (to sort tables) -->
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+
+    <!-- Graphing library --> 
+    <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+    
+    <script>
+    $(document).ready( function () {
+      $('table.table-sortable').DataTable( {
+        lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
+        //scrollY: '50vh',
+        scrollCollapse: true,
+        paging: false,
+        //scrollX: true,
+        //order: [[ -1, "desc" ]],
+      } );
+    } );
+    
+//    $('#go-plain').on('click', function () {
+//      $(this).button('XXX');
+//      $('table.table-sortable').DataTable().destroy(false);
+//    } );
+    </script>
+        
+  </body>
+</html>
