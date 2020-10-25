@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import click as ck
 import arvados
+from arvados.collection import CollectionReader
 import os
 import gzip
 from Bio import SeqIO
@@ -12,6 +13,7 @@ import socket
 import subprocess
 import tempfile
 import logging
+from report import generate_report
 
 
 ARVADOS_API_HOST = os.environ.get('ARVADOS_API_HOST', 'cborg.cbrc.kaust.edu.sa')
@@ -144,7 +146,8 @@ def submit_pangenome(
 @ck.option('--workflows-project', '-wp', default='cborg-j7d0g-lcux1tdrdshvul7', help='MRSA workflows project uuid')
 @ck.option('--metagenome-workflow-uuid', '-mwid', default='cborg-7fd4e-3ig4fl4bz90uydt', help='Metagenome workflow uuid')
 @ck.option('--pangenome-workflow-uuid', '-pwid', default='cborg-7fd4e-qhxoc5ddgrti3tq', help='Pangenome workflow uuid')
-def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid):    
+@ck.option('--pangenome-result-col-uuid', '-prcid', default='cborg-4zz18-5e3rl41vfzpqs9q', help='Pangenome workflow uuid')
+def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid, pangenome_result_col_uuid):    
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
     col = arvados.collection.Collection(api_client=api)
     state = {}
@@ -152,7 +155,8 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         state = json.loads(open('state.json').read())
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
     pangenome_data = []
-    update_pangenome = True
+    report_data = {'kraken': [], 'mlst': [], 'resistome': [], 'virulome': [], 'prokka': []}
+    update_pangenome = False
     for it in reads[1:]:
         col = api.collections().get(uuid=it['uuid']).execute()
         if 'sequence_label' not in it['properties']:
@@ -160,7 +164,13 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         sample_id = it['properties']['sequence_label']
         if 'analysis_status' in it['properties']:
             pangenome_data.append((sample_id, col['portable_data_hash']))
-            continue
+            col_reader = CollectionReader(col['uuid'])
+            report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
+            report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
+            report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
+            report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
+            report_data['prokka'].append((sample_id, get_prokka_report(col_reader)))
+        continue
         if sample_id not in state:
             state[sample_id] = {
                 'status': 'new',
@@ -209,9 +219,95 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         container_request, status = submit_pangenome(api, workflows_project, pangenome_workflow_uuid, pangenome_data)
         if status == 'submitted':
             state['last_pangenome_request'] = container_request
+            state['last_pangenome_request_status'] = 'submitted'
             print('Submitted pangenome request', container_request)
+    else:
+        cr = api.container_requests().get(
+            uuid=state["last_pangenome_request"]).execute()
+        cr_state = get_cr_state(api, cr)
+        print(f'Container request for pangenome workflow is {cr_state}')
+        if state['last_pangenome_request_status'] == 'submitted' and cr_state == 'Complete':
+            print('Updating results collection')
+            out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
+            api.collections().update(
+                uuid=pangenome_result_col_uuid,
+                body={"manifest_text": out_col["manifest_text"]}).execute()
+            state['last_pangenome_request_status'] = 'complete'
+
+    col_reader = CollectionReader(pangenome_result_col_uuid)
+    report_data["iqtree"] = get_iqtree_result(col_reader)
+    report_data["roary_svg"] = get_roary_svg(col_reader)
+    report_data["roary_stats"] = get_roary_stats(col_reader)
+    generate_report(report_data)
+    
     with open('state.json', 'w') as f:
         f.write(json.dumps(state))
+
+def get_roary_svg(col):
+    with col.open('gene_presence_absence.svg') as f:
+        return f.read().strip()
+
+def get_roary_stats(col):
+    with col.open('summary_statistics.txt') as f:
+        result = []
+        for line in f:
+            it = line.strip().split('\t')
+            result.append(it)
+        return result
+
+
+def get_iqtree_result(col):
+    with col.open('core.full.aln.treefile', 'r') as f:
+        return f.read().strip()
+
+def get_kraken_report(col):
+    result = []
+    with col.open('kraken_report.txt', "r") as f:
+        for line in f:
+            it = line.strip().split('\t')
+            if it[3] == 'S':
+                result.append((float(it[0]), it[4], it[5].strip()))
+                if len(result) == 4:
+                    break
+    return result
+
+def get_mlst_report(col):
+    result = []
+    with col.open('mlst.tsv', "r") as f:
+        line = next(f)
+        it = line.strip().split('\t')
+        result = it[1:]
+    while len(result) < 9:
+        result.append('-')
+    return result
+
+def get_resistome_report(col):
+    result = set()
+    with col.open('abricate_resfinder.tsv', "r") as f:
+        next(f)
+        for line in f:
+            it = line.strip().split('\t')
+            result |= set(it[-1].split(';'))
+    # print()
+    return result
+
+def get_virulome_report(col):
+    result = []
+    with col.open('abricate_vfdb.tsv', "r") as f:
+        next(f)
+        for line in f:
+            it = line.strip().split('\t')
+            result.append((it[5], float(it[9])))
+    return result
+
+def get_prokka_report(col):
+    result = {}
+    with col.open('prokka/prokka.txt', "r") as f:
+        next(f)
+        for line in f:
+            it = line.strip().split(': ')
+            result[it[0]] = it[1]
+    return result
 
 
 if __name__ == '__main__':

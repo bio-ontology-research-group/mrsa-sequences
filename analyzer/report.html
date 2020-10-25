@@ -174,11 +174,12 @@ Nullarbor
   <table id='jobinfo' class='table table-bordered table-condensed'>
     <thead>
       <tr>
-        <th>Isolates
-        <th>Author
-        <th>Date
-        <th>Host
-        <th>Folder
+        <th>Isolates</th>
+        <th>Author</th>
+        <th>Date</th>
+        <th>Host</th>
+        <th>Folder</th>
+      </tr>
     </thead>
     <tbody>
       <tr>
@@ -229,6 +230,7 @@ Nullarbor
         <th>AvgQual</th>
         <th>Depth</th>
         <th>Quality</th>
+      </tr>
     </thead>
     <tbody>
       <tr>
@@ -266,40 +268,42 @@ Nullarbor
   <table id='identification' class='display compact table-sortable'>
     <thead>
       <tr>
-        <th>Isolate
-        <th>#1 Match
-        <th>%
-        <th>#2 Match
-        <th>%
-        <th>#3 Match
-        <th>%
-        <th>#4 Match
-        <th>%
-        <th>Quality
+        <th>Isolate</th>
+        <th>#1 Match</th>
+        <th>%</th>
+        <th>#2 Match</th>
+        <th>%</th>
+        <th>#3 Match</th>
+        <th>%</th>
+        <th>#4 Match</th>
+        <th>%</th>
+        <th>Quality</th>
+      </tr>
     </thead>
     <tbody>
+      {% for sample_id,it in kraken %}
       <tr>
-        <td>CFSAN000952
-        <td><SPAN STYLE='color: black; font-weight: bold;'><span class='binomial'>Salmonella enterica</span></SPAN>
-        <td><SPAN STYLE='color: black; font-weight: bold;'>89.68</SPAN>
-        <td><SPAN STYLE='color: gray;'><span class='binomial'>unclassified</span></SPAN>
-        <td><SPAN STYLE='color: gray;'>5.65</SPAN>
-        <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Staphylococcus aureus</span></SPAN>
-        <td><SPAN STYLE='color: lightgray;'>0.08</SPAN>
-        <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Salmonella bongori</span></SPAN>
-        <td><SPAN STYLE='color: lightgray;'>0.01</SPAN>
-        <td><span class='traffic-light pass'>&#10004;</span>
-          <tr>
-            <td>CFSAN000211
-            <td><SPAN STYLE='color: black; font-weight: bold;'><span class='binomial'>Salmonella enterica</span></SPAN>
-            <td><SPAN STYLE='color: black; font-weight: bold;'>95.48</SPAN>
-            <td><SPAN STYLE='color: gray;'><span class='binomial'>unclassified</span></SPAN>
-            <td><SPAN STYLE='color: gray;'>1.55</SPAN>
-            <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Salmonella bongori</span></SPAN>
-            <td><SPAN STYLE='color: lightgray;'>0.01</SPAN>
-            <td><SPAN STYLE='color: lightgray;'><span class='binomial'>Escherichia coli</span></SPAN>
-            <td><SPAN STYLE='color: lightgray;'>0.01</SPAN>
-            <td><span class='traffic-light pass'>&#10004;</span>
+        <td>{{ sample_id }}</td>
+        <td><SPAN STYLE='color: black; font-weight: bold;'><span class='binomial'>{{ it[0][2] }}</span></SPAN></td>
+        <td><SPAN STYLE='color: black; font-weight: bold;'>{{ it[0][0] }}</SPAN></td>
+        <td><SPAN STYLE='color: gray;'><span class='binomial'>{{ it[1][2] }}</span></SPAN></td>
+        <td><SPAN STYLE='color: gray;'>{{ it[1][0] }}</SPAN></td>
+        <td><SPAN STYLE='color: lightgray;'><span class='binomial'>{{ it[2][2] }}</span></SPAN></td>
+        <td><SPAN STYLE='color: lightgray;'>{{ it[2][0] }}</SPAN></td>
+        <td><SPAN STYLE='color: lightgray;'><span class='binomial'>{{ it[3][2] }}</span></SPAN></td>
+        <td><SPAN STYLE='color: lightgray;'>{{ it[3][0] }}</SPAN></td>
+        <td>
+          {% if it[0][0] >= 80  %}
+          <span class='traffic-light pass'>&#10004;</span>
+          {% elif it[0][0] >= 65 %}
+          <span class='traffic-light dunno'>?</span>
+          {% else %}
+          <span class='traffic-light fail'>&#10008;</span>
+          {% endif %}
+        </td>
+        
+      </tr>
+      {% endfor %}
     </tbody><caption><span class='file-download-bar'>Download:  <a href='identification.csv' class='file-download'>&#11015;identification.csv</a></span>
     </caption>
   </table>
@@ -312,445 +316,182 @@ Nullarbor
   <table id='mlst' class='display compact table-sortable'>
     <thead>
       <tr>
-        <th>Isolate
-        <th>Scheme
-        <th>Sequence<BR>Type
-        <th>Allele
-        <th>Allele
-        <th>Allele
-        <th>Allele
-        <th>Allele
-        <th>Allele
-        <th>Allele
-        <th>Quality
+        <th>Isolate</th>
+        <th>Scheme</th>
+        <th>Sequence<BR>Type</th>
+        <th>Allele</th>
+        <th>Allele</th>
+        <th>Allele</th>
+        <th>Allele</th>
+        <th>Allele</th>
+        <th>Allele</th>
+        <th>Allele</th>
+        <th>Quality</th>
+      </tr>
     </thead>
     <tbody>
+      {% for sample_id, it in mlst %}
       <tr>
-        <td>Reference
-        <td>senterica
-        <td>909
-        <td><SPAN CLASS='allele known'>aroC(81)</SPAN>
-        <td><SPAN CLASS='allele known'>dnaN(283)</SPAN>
-        <td><SPAN CLASS='allele known'>hemD(101)</SPAN>
-        <td><SPAN CLASS='allele known'>hisD(12)</SPAN>
-        <td><SPAN CLASS='allele known'>purE(124)</SPAN>
-        <td><SPAN CLASS='allele known'>sucA(130)</SPAN>
-        <td><SPAN CLASS='allele known'>thrA(17)</SPAN>
-        <td><span class='traffic-light pass'>&#10004;</span>
-          <tr>
+        <td>{{ sample_id }}</td>
+        {% for item in it %}
+        <td>{{ item }}</td>
+        {% endfor %}
+        <td><span class='traffic-light pass'>&#10004;</span></td>
+      </tr>
+      {% endfor %}
     </tbody><caption><span class='file-download-bar'>Download:  <a href='mlst.csv' class='file-download'>&#11015;mlst.csv</a></span>
     </caption>
   </table>
 </div>
 
 <div class='container-fluid nullarbor-section' id='resistome'>
-<a name='resistome'></a>
-<h2>{% include "menu.html" %}
-Resistome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-<SPAN CLASS='legend'>
-<B>Legend:</B>
-<SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;95% coverage'>&#10004;</span> &ge;95% coverage</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='<95% coverage'>?</span> <95% coverage</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light fail' title='absent'>&#10008;</span> absent</SPAN>
-</SPAN>
+  <a name='resistome'></a>
+  <h2>{% include "menu.html" %}
+    Resistome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+  <SPAN CLASS='legend'>
+    <B>Legend:</B>
+    <SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;95% coverage'>&#10004;</span> &ge;95% coverage</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&lt;95% coverage'>?</span> &lt;95% coverage</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light fail' title='absent'>&#10008;</span> absent</SPAN>
+  </SPAN>
 
-<table id='resistome' class='display compact table-sortable'>
-<thead>
-<tr>
-<th>Isolate
-<th>Found
-</thead>
-<tbody>
-<tr>
-<td>CFSAN000952
-<td>0
-</tbody><caption><span class='file-download-bar'>Download:  <a href='resistome.csv' class='file-download'>&#11015;resistome.csv</a></span>
-</caption>
-</table>
+  <table id='resistome' class='display compact table-sortable'>
+    <thead>
+      <tr>
+        <th>Isolate</th>
+        <th>Found</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sample_id, it in resistome %}
+      <tr>
+        <td>{{ sample_id }}</td>
+        <td>{{ it|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <caption>
+      <span class='file-download-bar'>Download:  <a href='resistome.csv' class='file-download'>&#11015;resistome.csv</a></span>
+    </caption>
+  </table>
 </div>
 
 <div class='container-fluid nullarbor-section' id='virulome'>
-<a name='virulome'></a>
-<h2>{% include "menu.html" %}
-Virulome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-<SPAN CLASS='legend'>
-<B>Legend:</B>
-<SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;95% coverage'>&#10004;</span> &ge;95% coverage</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='<95% coverage'>?</span> <95% coverage</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light fail' title='. absent'>&#10008;</span> . absent</SPAN>
-</SPAN>
+  <a name='virulome'></a>
+  <h2>
+    {% include "menu.html" %}
+    Virulome <a href='#' class='jump-home'>&#x25B2;</a>
+  </h2>
+  <SPAN CLASS='legend'>
+    <B>Legend:</B>
+    <SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;95% coverage'>&#10004;</span> &ge;95% coverage</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&lt;95% coverage'>?</span> &lt;95% coverage</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light fail' title='. absent'>&#10008;</span> . absent</SPAN>
+  </SPAN>
 
-<table id='virulome' class='display compact table-sortable'>
-<thead>
-<tr>
-<th>Isolate
-<th>Found
-<th><DIV CLASS='vertical'>avrA</DIV>
-<th><DIV CLASS='vertical'>cheA</DIV>
-<th><DIV CLASS='vertical'>cheD</DIV>
-<th><DIV CLASS='vertical'>cheW</DIV>
-<th><DIV CLASS='vertical'>cheY</DIV>
-<th><DIV CLASS='vertical'>csgA</DIV>
-<th><DIV CLASS='vertical'>csgB</DIV>
-<th><DIV CLASS='vertical'>csgC</DIV>
-<th><DIV CLASS='vertical'>csgD</DIV>
-<th><DIV CLASS='vertical'>csgE</DIV>
-<th><DIV CLASS='vertical'>csgF</DIV>
-<th><DIV CLASS='vertical'>csgG</DIV>
-<th><DIV CLASS='vertical'>entA</DIV>
-<th><DIV CLASS='vertical'>entB</DIV>
-<th><DIV CLASS='vertical'>entC</DIV>
-<th><DIV CLASS='vertical'>entE</DIV>
-<th><DIV CLASS='vertical'>entS</DIV>
-<th><DIV CLASS='vertical'>faeC</DIV>
-<th><DIV CLASS='vertical'>faeD</DIV>
-<th><DIV CLASS='vertical'>faeE</DIV>
-<th><DIV CLASS='vertical'>faeF</DIV>
-<th><DIV CLASS='vertical'>faeH</DIV>
-<th><DIV CLASS='vertical'>fepA</DIV>
-<th><DIV CLASS='vertical'>fepB</DIV>
-<th><DIV CLASS='vertical'>fepC</DIV>
-<th><DIV CLASS='vertical'>fepD</DIV>
-<th><DIV CLASS='vertical'>fepG</DIV>
-<th><DIV CLASS='vertical'>fimC</DIV>
-<th><DIV CLASS='vertical'>fimD</DIV>
-<th><DIV CLASS='vertical'>fimF</DIV>
-<th><DIV CLASS='vertical'>fimH</DIV>
-<th><DIV CLASS='vertical'>fimI</DIV>
-<th><DIV CLASS='vertical'>flgE</DIV>
-<th><DIV CLASS='vertical'>flgG</DIV>
-<th><DIV CLASS='vertical'>flgH</DIV>
-<th><DIV CLASS='vertical'>flhC</DIV>
-<th><DIV CLASS='vertical'>fliA</DIV>
-<th><DIV CLASS='vertical'>fliC</DIV>
-<th><DIV CLASS='vertical'>fliG</DIV>
-<th><DIV CLASS='vertical'>fliM</DIV>
-<th><DIV CLASS='vertical'>fliN</DIV>
-<th><DIV CLASS='vertical'>fliP</DIV>
-<th><DIV CLASS='vertical'>gmhA/lpcA</DIV>
-<th><DIV CLASS='vertical'>gogB</DIV>
-<th><DIV CLASS='vertical'>gtrA</DIV>
-<th><DIV CLASS='vertical'>gtrB</DIV>
-<th><DIV CLASS='vertical'>invA</DIV>
-<th><DIV CLASS='vertical'>invB</DIV>
-<th><DIV CLASS='vertical'>invC</DIV>
-<th><DIV CLASS='vertical'>invE</DIV>
-<th><DIV CLASS='vertical'>invF</DIV>
-<th><DIV CLASS='vertical'>invG</DIV>
-<th><DIV CLASS='vertical'>invH</DIV>
-<th><DIV CLASS='vertical'>invI</DIV>
-<th><DIV CLASS='vertical'>invJ</DIV>
-<th><DIV CLASS='vertical'>iroB</DIV>
-<th><DIV CLASS='vertical'>iroC</DIV>
-<th><DIV CLASS='vertical'>iroN</DIV>
-<th><DIV CLASS='vertical'>lpfA</DIV>
-<th><DIV CLASS='vertical'>lpfB</DIV>
-<th><DIV CLASS='vertical'>lpfC</DIV>
-<th><DIV CLASS='vertical'>lpfD</DIV>
-<th><DIV CLASS='vertical'>lpfE</DIV>
-<th><DIV CLASS='vertical'>manB</DIV>
-<th><DIV CLASS='vertical'>mgtB</DIV>
-<th><DIV CLASS='vertical'>mgtC</DIV>
-<th><DIV CLASS='vertical'>mig-14</DIV>
-<th><DIV CLASS='vertical'>misL</DIV>
-<th><DIV CLASS='vertical'>ompA</DIV>
-<th><DIV CLASS='vertical'>orgA</DIV>
-<th><DIV CLASS='vertical'>orgB</DIV>
-<th><DIV CLASS='vertical'>orgC</DIV>
-<th><DIV CLASS='vertical'>pipB</DIV>
-<th><DIV CLASS='vertical'>pipB2</DIV>
-<th><DIV CLASS='vertical'>prgH</DIV>
-<th><DIV CLASS='vertical'>prgI</DIV>
-<th><DIV CLASS='vertical'>prgJ</DIV>
-<th><DIV CLASS='vertical'>prgK</DIV>
-<th><DIV CLASS='vertical'>ratB</DIV>
-<th><DIV CLASS='vertical'>shdA</DIV>
-<th><DIV CLASS='vertical'>sicA</DIV>
-<th><DIV CLASS='vertical'>sicP</DIV>
-<th><DIV CLASS='vertical'>sifA</DIV>
-<th><DIV CLASS='vertical'>sifB</DIV>
-<th><DIV CLASS='vertical'>sinH</DIV>
-<th><DIV CLASS='vertical'>sipA/sspA</DIV>
-<th><DIV CLASS='vertical'>sipB/sspB</DIV>
-<th><DIV CLASS='vertical'>sipC/sspC</DIV>
-<th><DIV CLASS='vertical'>sipD</DIV>
-<th><DIV CLASS='vertical'>slrP</DIV>
-<th><DIV CLASS='vertical'>sopA</DIV>
-<th><DIV CLASS='vertical'>sopB/sigD</DIV>
-<th><DIV CLASS='vertical'>sopD</DIV>
-<th><DIV CLASS='vertical'>sopD2</DIV>
-<th><DIV CLASS='vertical'>sopE2</DIV>
-<th><DIV CLASS='vertical'>spaO</DIV>
-<th><DIV CLASS='vertical'>spaP</DIV>
-<th><DIV CLASS='vertical'>spaQ</DIV>
-<th><DIV CLASS='vertical'>spaR</DIV>
-<th><DIV CLASS='vertical'>spaS</DIV>
-<th><DIV CLASS='vertical'>spiC/ssaB</DIV>
-<th><DIV CLASS='vertical'>sptP</DIV>
-<th><DIV CLASS='vertical'>ssaC</DIV>
-<th><DIV CLASS='vertical'>ssaD</DIV>
-<th><DIV CLASS='vertical'>ssaE</DIV>
-<th><DIV CLASS='vertical'>ssaG</DIV>
-<th><DIV CLASS='vertical'>ssaH</DIV>
-<th><DIV CLASS='vertical'>ssaI</DIV>
-<th><DIV CLASS='vertical'>ssaJ</DIV>
-<th><DIV CLASS='vertical'>ssaK</DIV>
-<th><DIV CLASS='vertical'>ssaL</DIV>
-<th><DIV CLASS='vertical'>ssaM</DIV>
-<th><DIV CLASS='vertical'>ssaN</DIV>
-<th><DIV CLASS='vertical'>ssaO</DIV>
-<th><DIV CLASS='vertical'>ssaP</DIV>
-<th><DIV CLASS='vertical'>ssaQ</DIV>
-<th><DIV CLASS='vertical'>ssaR</DIV>
-<th><DIV CLASS='vertical'>ssaS</DIV>
-<th><DIV CLASS='vertical'>ssaT</DIV>
-<th><DIV CLASS='vertical'>ssaU</DIV>
-<th><DIV CLASS='vertical'>ssaV</DIV>
-<th><DIV CLASS='vertical'>sscA</DIV>
-<th><DIV CLASS='vertical'>sscB</DIV>
-<th><DIV CLASS='vertical'>sseA</DIV>
-<th><DIV CLASS='vertical'>sseB</DIV>
-<th><DIV CLASS='vertical'>sseC</DIV>
-<th><DIV CLASS='vertical'>sseD</DIV>
-<th><DIV CLASS='vertical'>sseE</DIV>
-<th><DIV CLASS='vertical'>sseF</DIV>
-<th><DIV CLASS='vertical'>sseG</DIV>
-<th><DIV CLASS='vertical'>sseJ</DIV>
-<th><DIV CLASS='vertical'>sseK1</DIV>
-<th><DIV CLASS='vertical'>sseK2</DIV>
-<th><DIV CLASS='vertical'>sseL</DIV>
-<th><DIV CLASS='vertical'>sspH2</DIV>
-<th><DIV CLASS='vertical'>steA</DIV>
-<th><DIV CLASS='vertical'>steB</DIV>
-<th><DIV CLASS='vertical'>steC</DIV>
-</thead>
-<tbody>
-<tr>
-<td>CFSAN000952
-<td>136
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='16% + 18%'>?</span>
-<td><span class='traffic-light dunno' title='8% + 41%'>?</span>
-<td><span class='traffic-light dunno' title='91%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='91%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='91%'>?</span>
-<td><span class='traffic-light dunno' title='86%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='90%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='91%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='31%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='80%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='19% + 34% + 19% + 32%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='62%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='70%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td>.
-<td><span class='traffic-light dunno' title='14%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td>.
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light dunno' title='100% + 1%'>?</span>
-<td><span class='traffic-light dunno' title='59%'>?</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-<td><span class='traffic-light pass'>&#10004;</span>
-</tbody><caption><span class='file-download-bar'>Download:  <a href='virulome.csv' class='file-download'>&#11015;virulome.csv</a></span>
-</caption>
-</table>
+  <table id='virulome' class='display compact table-sortable'>
+    <thead>
+      <tr>
+        <th>Isolate</th>
+        <th>Found</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sample_id, it in virulome %}
+      <tr>
+        <td>{{ sample_id }}</td>
+        <td>{{ it|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody><caption><span class='file-download-bar'>Download:  <a href='virulome.csv' class='file-download'>&#11015;virulome.csv</a></span>
+    </caption>
+  </table>
 </div>
 
 <div class='container-fluid nullarbor-section' id='assembly'>
-<a name='assembly'></a>
-<h2>{% include "menu.html" %}
-Assembly and annotation <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-<SPAN CLASS='legend'>
-<B>Legend:</B>
-<SPAN CLASS='legend-item'><span class='traffic-light pass' title='Typical'>&#10004;</span> Typical</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&mu;<SUB>Contigs</SUB>=57 &and; &mu;<SUB>bp</SUB>=4753003'>?</span> &mu;<SUB>Contigs</SUB>=57 &and; &mu;<SUB>bp</SUB>=4753003</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light fail' title='Contigs &gt; 1.5&mu; &or; bp &plusmn; 0.2&mu;'>&#10008;</span> Contigs &gt; 1.5&mu; &or; bp &plusmn; 0.2&mu;</SPAN>
+  <a name='assembly'></a>
+  <h2>{% include "menu.html" %}
+    Assembly and annotation <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+  <SPAN CLASS='legend'>
+    <B>Legend:</B>
+    <SPAN CLASS='legend-item'><span class='traffic-light pass' title='Typical'>&#10004;</span> Typical</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&mu;<SUB>Contigs</SUB>=57 &and; &mu;<SUB>bp</SUB>=4753003'>?</span> &mu;<SUB>Contigs</SUB>=57 &and; &mu;<SUB>bp</SUB>=4753003</SPAN>
+    <SPAN CLASS='legend-item'><span class='traffic-light fail' title='Contigs &gt; 1.5&mu; &or; bp &plusmn; 0.2&mu;'>&#10008;</span> Contigs &gt; 1.5&mu; &or; bp &plusmn; 0.2&mu;</SPAN>
 
-</SPAN>
-<table id='assembly' class='display compact table-sortable'>
-<thead>
-<tr>
-<th>Isolate
-<th>Contigs
-<th>bp
-<th>ok
-<th>Ns
-<th>gaps
-<th>min
-<th>avg
-<th>max
-<th>N50
-<th>CDS
-<th>rRNA
-<th>tRNA
-<th>tmRNA
-<th>Quality
-</thead>
-<tbody>
-<tr>
-<td>CFSAN000189
-<td>29
-<td>4759947
-<td>4759947
-<td>0
-<td>0
-<td>518
-<td>164136
-<td>645633
-<td>313057
-<td>4432
-<td>4
-<td>68
-<td>1
-<td><span class='traffic-light pass'>&#10004;</span>
-</tbody><caption><span class='file-download-bar'>Download:  <a href='assembly.csv' class='file-download'>&#11015;assembly.csv</a></span>
-</caption>
-</table>
+  </SPAN>
+  <table id='assembly' class='display compact table-sortable'>
+    <thead>
+      <tr>
+        <th>Isolate</th>
+        <th>Contigs</th>
+        <th>bp</th>
+        <th>ok</th>
+        <th>Ns</th>
+        <th>gaps</th>
+        <th>min</th>
+        <th>avg</th>
+        <th>max</th>
+        <th>N50</th>
+        <th>CDS</th>
+        <th>rRNA</th>
+        <th>tRNA</th>
+        <th>tmRNA</th>
+        <th>Quality</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sample_id, it in prokka %}
+      <tr>
+        <td>{{ sample_id }}</td>
+        <td>{{ it.contigs }}</td>
+        <td>{{ it.bases }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>{{ it.CDS }}</td>
+        <td>{{ it.rRNA }}</td>
+        <td>{{ it.tRNA }}</td>
+        <td>{{ it.tmRNA }}</td>
+        <td><span class='traffic-light pass'>&#10004;</span></td>
+      </tr>
+      {% endfor %}
+    </tbody><caption><span class='file-download-bar'>Download:  <a href='assembly.csv' class='file-download'>&#11015;assembly.csv</a></span>
+    </caption>
+  </table>
 </div>
 
-<div class='container-fluid nullarbor-section' id='reference'>
-<a name='reference'></a>
-<h2>{% include "menu.html" %}
-Reference genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-<table id='reference' class='display compact table-sortable'>
-<thead>
-<tr>
-<th>Sequence
-<th>Length
-<th>Description
-</thead>
-<tbody>
-<tr>
-<td>CP006053
-<td>4730612
-<td>CP006053 Salmonella enterica subsp. enterica serovar Bareilly str. CFSAN000189, complete genome.
-<tr>
-<td>CP006054
-<td>78193
-<td>CP006054 Salmonella enterica subsp. enterica serovar Bareilly str. CFSAN000189 plasmid unnamed, complete sequence.
-<tr>
-<td>TOTAL
-<td>4808805
-<td>Total reference size in bp
-</tbody><caption><span class='file-download-bar'>Download:  <a href='reference.csv' class='file-download'>&#11015;reference.csv</a></span>
-</caption>
-</table>
-</div>
+<!-- <div class='container-fluid nullarbor-section' id='reference'> -->
+<!--   <a name='reference'></a> -->
+<!--   <h2>{% include "menu.html" %} -->
+<!--     Reference genome <a href='#' class='jump-home'>&#x25B2;</a> </h2> -->
+<!--   <table id='reference' class='display compact table-sortable'> -->
+<!--     <thead> -->
+<!--       <tr> -->
+<!--         <th>Sequence -->
+<!--         <th>Length -->
+<!--         <th>Description -->
+<!--     </thead> -->
+<!--     <tbody> -->
+<!--       <tr> -->
+<!--         <td>CP006053 -->
+<!--         <td>4730612 -->
+<!--         <td>CP006053 Salmonella enterica subsp. enterica serovar Bareilly str. CFSAN000189, complete genome. -->
+<!--           <tr> -->
+<!--             <td>CP006054 -->
+<!--             <td>78193 -->
+<!--             <td>CP006054 Salmonella enterica subsp. enterica serovar Bareilly str. CFSAN000189 plasmid unnamed, complete sequence. -->
+<!--               <tr> -->
+<!--                 <td>TOTAL -->
+<!--                 <td>4808805 -->
+<!--                 <td>Total reference size in bp -->
+<!--     </tbody><caption><span class='file-download-bar'>Download:  <a href='reference.csv' class='file-download'>&#11015;reference.csv</a></span> -->
+<!--     </caption> -->
+<!--   </table> -->
+<!-- </div> -->
 
 <div class='container-fluid nullarbor-section' id='core'>
 <a name='core'></a>
@@ -812,112 +553,10 @@ tree.internalLabelStyle.colour = 'green';
 tree.on('error', function (event) { throw event.error; });
 tree.on('loaded', function () { console.log('loaded phylocanvas'); });
 tree.on('beforeFirstDraw', function () {
-  tree.metadata.headerAngle = 60;
-  tree.metadata.columns = [ 'ST', 'AMR' ];
-  tree.leaves[0].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[1].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[3].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[4].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[2].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[5].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[18].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[19].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[9].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[7].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[16].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[17].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[20].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[6].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[21].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[11].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[12].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[13].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[15].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[10].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[8].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[14].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[22].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[23].data = { 
-    ST: { label: '909', colour: 'white' },
-    AMR: { label: '-', colour: 'white' },
-  };
-  tree.leaves[23].labelStyle.format = 'bold';
 });
-tree.load('(CFSAN000189:0.0000020665,(((CFSAN000191:0.1707412424,CFSAN000228:0.0694680500)73.3_65:0.0610850322,(CFSAN000211:0.0000027775,CFSAN000212:0.0071355327)97.5_100:0.3567236154)100_100:0.8838710137,((((((((((((((((CFSAN000661:0.0000000000,CFSAN000958:0.0000000000):0.0000000000,CFSAN000753:0.0000000000):0.0000000000,CFSAN001115:0.0000000000):0.0000000000,CFSAN000752:0.0000000000):0.0000000000,CFSAN001112:0.0000000000):0.0000000000,CFSAN000961:0.0000000000):0.0000000000,CFSAN000963:0.0000000000):0.0000000000,CFSAN000968:0.0000000000):0.0000000000,CFSAN001118:0.0000000000):0.0000000000,CFSAN000970:0.0000000000):0.0000000000,CFSAN000951:0.0000000000):0.0000000000,CFSAN000952:0.0000000000):0.0000027775,CFSAN000669:0.0000027775)0_74:0.0000023337,(CFSAN000700:0.0073015317,CFSAN000954:0.0073015294)0_25:0.0000025778)0_17:0.0000021494,CFSAN000960:0.0073461444)83.1_71:0.0073732154,CFSAN001140:0.0000020985)89.4_99:0.1149764215)0_59:0.0000020215,Reference:0.0411130501);');
+tree.load('{{ iqtree }}');
 tree.setTreeType('rectangular');
-tree.setTextSize(14);
-tree.setNodeSize(4);
 tree.draw();
-
 </script>
 </div>
 <span class='file-download-bar'>Download:  <a href='core.newick' class='file-download'>&#11015;core.newick</a></span>
@@ -1626,43 +1265,36 @@ var layout = {
 };
 Plotly.newPlot('snpdensity-histogram', data, layout);
 </script>
-</div><div class='container-fluid nullarbor-section' id='pan'>
+</div>
+
+<div class='container-fluid nullarbor-section' id='pan'>
 <a name='pan'></a>
 <h2>{% include "menu.html" %}
 Pan genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
 <p class='container-fluid'>
+{{ roary_svg }}
 </p>
 <table id='pan' class='table table-bordered table-condensed'>
-<thead>
-<tr>
-<th>Ortholog class
-<th>Definition
-<th>Count
-</thead>
-<tbody>
-<tr>
-<td>Core genes
-<td>(99% <= strains <= 100%)
-<td>4277
-<tr>
-<td>Soft core genes
-<td>(95% <= strains < 99%)
-<td>50
-<tr>
-<td>Shell genes
-<td>(15% <= strains < 95%)
-<td>163
-<tr>
-<td>Cloud genes
-<td>(0% <= strains < 15%)
-<td>286
-<tr>
-<td>Total genes
-<td>(0% <= strains <= 100%)
-<td>4776
-</tbody><caption><span class='file-download-bar'>Download:  <a href='pan.csv' class='file-download'>&#11015;pan.csv</a></span>
-</caption>
+  <thead>
+    <tr>
+      <th>Ortholog class</th>
+      <th>Definition</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for it in roary_stats %}
+    <tr>
+      <td>{{ it[0] }}</td>
+      <td>{{ it[1] }}</td>
+      <td>{{ it[2] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <caption><span class='file-download-bar'>Download:  <a href='pan.csv' class='file-download'>&#11015;pan.csv</a></span>
+  </caption>
 </table>
+
 <p class='container-fluid'>
 <svg viewBox="0 0 1024 392" width='1024' height='392' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' ><defs><style type='text/css'><![CDATA[
  .leaf-label {font-size:12;font-family:sans-serif;}

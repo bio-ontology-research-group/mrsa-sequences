@@ -18,9 +18,15 @@ outputs:
   alignment:
     type: File
     outputSource: snippyCore/alignments
+  snp_dists:
+    type: File
+    outputSource: snpDists/distances
   pangenome:
     type: File
     outputSource: roary/pangenome
+  pangenome_stats:
+    type: File
+    outputSource: roary/statistics
   treefile:
     type: File
     outputSource: iqTree/result_tree
@@ -35,7 +41,10 @@ outputs:
     outputSource: induceGraph/seqwishGFA
   odgi:
     type: File
-    outputSource: vizGraph/odgiPNG 
+    outputSource: vizGraph/odgiPNG
+  pangenome_svg:
+    type: File
+    outputSource: roary2svg/svg
 steps:
   snippyCore:
     in:
@@ -52,7 +61,7 @@ steps:
   roary:
     in:
       gff_files: gff_files
-    out: [gene_presence_absence,pangenome]
+    out: [gene_presence_absence,pangenome,statistics]
     run: roary.cwl
   augur_refine:
     in:
@@ -106,3 +115,13 @@ steps:
     in: {inputODGI: buildGraph/odgiGraph}
     out: [odgiPNG]
     run: odgi-viz.cwl
+  snpDists:
+    in:
+      alignments: snippyCore/alignments
+    out: [distances]
+    run: snp-dists.cwl
+  roary2svg:
+    in:
+      genePA: roary/gene_presence_absence
+    out: [svg]
+    run: roary2svg.cwl
