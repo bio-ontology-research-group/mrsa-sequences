@@ -13,7 +13,7 @@ import socket
 import subprocess
 import tempfile
 import logging
-from report import generate_report
+from analyzer.report import generate_report
 
 
 ARVADOS_API_HOST = os.environ.get('ARVADOS_API_HOST', 'cborg.cbrc.kaust.edu.sa')
