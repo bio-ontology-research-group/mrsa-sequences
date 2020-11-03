@@ -16,6 +16,10 @@ import logging
 from analyzer.report import generate_report
 
 
+logging.basicConfig(format="[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S",
+                    level=logging.INFO)
+logging.getLogger("googleapiclient.discovery").setLevel(logging.WARN)
+
 ARVADOS_API_HOST = os.environ.get('ARVADOS_API_HOST', 'cborg.cbrc.kaust.edu.sa')
 ARVADOS_API_TOKEN = os.environ.get('ARVADOS_API_TOKEN', '')
 
@@ -147,7 +151,9 @@ def submit_pangenome(
 @ck.option('--metagenome-workflow-uuid', '-mwid', default='cborg-7fd4e-3ig4fl4bz90uydt', help='Metagenome workflow uuid')
 @ck.option('--pangenome-workflow-uuid', '-pwid', default='cborg-7fd4e-qhxoc5ddgrti3tq', help='Pangenome workflow uuid')
 @ck.option('--pangenome-result-col-uuid', '-prcid', default='cborg-4zz18-5e3rl41vfzpqs9q', help='Pangenome workflow uuid')
-def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid, pangenome_result_col_uuid):    
+def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid, pangenome_result_col_uuid): 
+    logging.info("Starting a analysis run")
+
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
     col = arvados.collection.Collection(api_client=api)
     state = {}
@@ -184,7 +190,7 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                 it['portable_data_hash'])
             sample_state['status'] = status
             sample_state['container_request'] = container_request
-            print(f'Submitted analysis request for {sample_id}')
+            logging.info('Submitted analysis request for %s', sample_id)
         elif sample_state['status'] == 'submitted':
             # TODO: check container request status
             if sample_state['container_request'] is None:
@@ -192,7 +198,7 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
             cr = api.container_requests().get(
                 uuid=sample_state["container_request"]).execute()
             cr_state = get_cr_state(api, cr)
-            print(f'Container request for {sample_id} is {cr_state}')
+            logging.info('Container request for %s is %s', sample_id, cr_state)
             if cr_state == 'Complete':
                 out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
                 sample_state['output_collection'] = cr["output_uuid"]
@@ -220,14 +226,14 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         if status == 'submitted':
             state['last_pangenome_request'] = container_request
             state['last_pangenome_request_status'] = 'submitted'
-            print('Submitted pangenome request', container_request)
+            logging.info('Submitted pangenome request %s', container_request)
     else:
         cr = api.container_requests().get(
             uuid=state["last_pangenome_request"]).execute()
         cr_state = get_cr_state(api, cr)
-        print(f'Container request for pangenome workflow is {cr_state}')
+        logging.info('Container request for pangenome workflow is %s', cr_state)
         if state['last_pangenome_request_status'] == 'submitted' and cr_state == 'Complete':
-            print('Updating results collection')
+            logging.info('Updating results collection')
             out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
             api.collections().update(
                 uuid=pangenome_result_col_uuid,
