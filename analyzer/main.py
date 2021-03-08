@@ -13,8 +13,12 @@ import socket
 import subprocess
 import tempfile
 import logging
-from report import generate_report
+from analyzer.report import generate_report
 
+
+logging.basicConfig(format="[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S",
+                    level=logging.INFO)
+logging.getLogger("googleapiclient.discovery").setLevel(logging.WARN)
 
 ARVADOS_API_HOST = os.environ.get('ARVADOS_API_HOST', 'cborg.cbrc.kaust.edu.sa')
 ARVADOS_API_TOKEN = os.environ.get('ARVADOS_API_TOKEN', '')
@@ -147,7 +151,9 @@ def submit_pangenome(
 @ck.option('--metagenome-workflow-uuid', '-mwid', default='cborg-7fd4e-3ig4fl4bz90uydt', help='Metagenome workflow uuid')
 @ck.option('--pangenome-workflow-uuid', '-pwid', default='cborg-7fd4e-qhxoc5ddgrti3tq', help='Pangenome workflow uuid')
 @ck.option('--pangenome-result-col-uuid', '-prcid', default='cborg-4zz18-5e3rl41vfzpqs9q', help='Pangenome workflow uuid')
-def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid, pangenome_result_col_uuid):    
+def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid, pangenome_result_col_uuid): 
+    logging.info("Starting a analysis run")
+
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
     col = arvados.collection.Collection(api_client=api)
     state = {}

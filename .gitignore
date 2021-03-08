@@ -23,3 +23,6 @@ state.json
 workflows/MRSA094/
 workflows/prokka/
 *~
+.vscode
+__pycache__
+build

@@ -1,6 +1,7 @@
 import jinja2
 
-templateLoader = jinja2.FileSystemLoader(searchpath="./analyzer")
+# templateLoader = jinja2.FileSystemLoader(searchpath="./analyzer")
+templateLoader = jinja2.PackageLoader(__name__, '')
 templateEnv = jinja2.Environment(loader=templateLoader)
 
 def generate_report(data):
