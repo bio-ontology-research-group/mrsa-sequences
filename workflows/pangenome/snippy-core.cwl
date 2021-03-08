@@ -42,4 +42,8 @@ outputs:
     type: File
     outputBinding:
       glob: core.vcf
+  outputTxt:
+    type: File
+    outputBinding:
+      glob: core.txt
 

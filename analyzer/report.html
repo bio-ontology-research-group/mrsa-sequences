@@ -501,35 +501,39 @@ Core genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
 <B>Legend:</B>
 <SPAN CLASS='legend-item'><span class='traffic-light pass' title='&ge;90% used'>&#10004;</span> &ge;90% used</SPAN>
 <SPAN CLASS='legend-item'><span class='traffic-light dunno' title='&ge;70% used'>?</span> &ge;70% used</SPAN>
-<SPAN CLASS='legend-item'><span class='traffic-light fail' title='<70% used'>&#10008;</span> <70% used</SPAN>
+<SPAN CLASS='legend-item'><span class='traffic-light fail' title='&lt;70% used'>&#10008;</span> &lt;70% used</SPAN>
 
 </SPAN>
 <table id='core' class='display compact table-sortable'>
 <thead>
 <tr>
-<th>Isolate
-<th>LENGTH
-<th>ALIGNED
-<th>UNALIGNED
-<th>VARIANT
-<th>HET
-<th>MASKED
-<th>LOWCOV
-<th>%Used
-<th>Quality
+<th>Isolate</th>
+<th>LENGTH</th>
+<th>ALIGNED</th>
+<th>UNALIGNED</th>
+<th>VARIANT</th>
+<th>HET</th>
+<th>MASKED</th>
+<th>LOWCOV</th>
+<th>%Used</th>
+<th>Quality</th>
+  </tr>
 </thead>
 <tbody>
-<tr>
-<td>CFSAN000189
-<td>4808805
-<td>4750050
-<td>56530
-<td>5
-<td>39
-<td>0
-<td>2186
-<td>98.78
-<td><span class='traffic-light pass'>&#10004;</span>
+  {% for it in core %}
+  <tr>
+    {% for item in it %}
+    <td> {{ item }} </td>
+    {% endfor %}
+    {% if it[8] >= 90 %}
+      <td><span class='traffic-light pass'>&#10004;</span></td>
+    {% elif it[8] >= 70 %}
+      <td><span class='traffic-light dunno'>?</span></td>
+    {% else %}
+      <td><span class='traffic-light fail'>&#10008;</span></td>
+    {% endif %}
+</tr>
+  {% endfor %}
 </tbody><caption><span class='file-download-bar'>Download:  <a href='core.csv' class='file-download'>&#11015;core.csv</a></span>
 </caption>
 </table>
@@ -570,12 +574,12 @@ Pairwise core SNP distances <a href='#' class='jump-home'>&#x25B2;</a> </h2>
 <div id='snpdist-histogram'>
 </div>
 <script>
-var nums = [ 54,55,27,89,89,90,89,89,89,89,90,89,90,89,89,89,89,89,89,89,88,85,1,45,91,91,92,91,91,91,91,92,91,92,91,91,91,91,91,91,91,90,87,46,92,92,93,92,92,92,92,93,92,93,92,92,92,92,92,92,92,91,88,80,80,81,80,80,80,80,81,80,81,80,80,80,80,80,80,80,79,76,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,20,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,20,1,1,1,1,2,1,2,1,1,1,1,1,1,1,2,21,0,0,0,1,0,1,0,0,0,0,0,0,0,1,20,0,0,1,0,1,0,0,0,0,0,0,0,1,20,0,1,0,1,0,0,0,0,0,0,0,1,20,1,0,1,0,0,0,0,0,0,0,1,20,1,2,1,1,1,1,1,1,1,2,21,1,0,0,0,0,0,0,0,1,20,1,1,1,1,1,1,1,2,21,0,0,0,0,0,0,1,20,0,0,0,0,0,1,20,0,0,0,0,1,20,0,0,0,1,20,0,0,1,20,0,1,20,1,20,19 ];
+
 var data = [ { 
   type: 'histogram',
-  x: nums, 
+  x: {{ snp_hist.nums }}, 
   autobinx: false,
-  xbins: { start: 0, end: 93, size: 1 },
+  xbins: { start: {{ snp_hist.start }}, end: {{ snp_hist.end }}, size: 100 },
 } ];
 var layout = {
   title: 'Pairwise core SNP distance histogram',
@@ -587,684 +591,22 @@ Plotly.newPlot('snpdist-histogram', data, layout);
 <table id='snpdist' class='display compact table-sortable'>
 <thead>
 <tr>
-<th>
-<th><div class='vertical'>CFSAN000189</div>
-<th><div class='vertical'>CFSAN000191</div>
-<th><div class='vertical'>CFSAN000211</div>
-<th><div class='vertical'>CFSAN000212</div>
-<th><div class='vertical'>CFSAN000228</div>
-<th><div class='vertical'>CFSAN000661</div>
-<th><div class='vertical'>CFSAN000669</div>
-<th><div class='vertical'>CFSAN000700</div>
-<th><div class='vertical'>CFSAN000752</div>
-<th><div class='vertical'>CFSAN000753</div>
-<th><div class='vertical'>CFSAN000951</div>
-<th><div class='vertical'>CFSAN000952</div>
-<th><div class='vertical'>CFSAN000954</div>
-<th><div class='vertical'>CFSAN000958</div>
-<th><div class='vertical'>CFSAN000960</div>
-<th><div class='vertical'>CFSAN000961</div>
-<th><div class='vertical'>CFSAN000963</div>
-<th><div class='vertical'>CFSAN000968</div>
-<th><div class='vertical'>CFSAN000970</div>
-<th><div class='vertical'>CFSAN001112</div>
-<th><div class='vertical'>CFSAN001115</div>
-<th><div class='vertical'>CFSAN001118</div>
-<th><div class='vertical'>CFSAN001140</div>
-<th><div class='vertical'>Reference</div>
+  {% for it in snp_dists.header %}
+  <th><div class='vertical'>{{ it }}</div></th>
+  {% endfor %}
+</tr>
 </thead>
 <tbody>
-<tr>
-<td>CFSAN000189
-<td>0
-<td>80
-<td>82
-<td>83
-<td>71
-<td>15
-<td>15
-<td>16
-<td>15
-<td>15
-<td>15
-<td>15
-<td>16
-<td>15
-<td>16
-<td>15
-<td>15
-<td>15
-<td>15
-<td>15
-<td>15
-<td>15
-<td>14
-<td>5
-<tr>
-<td>CFSAN000191
-<td>80
-<td>0
-<td>54
-<td>55
-<td>27
-<td>89
-<td>89
-<td>90
-<td>89
-<td>89
-<td>89
-<td>89
-<td>90
-<td>89
-<td>90
-<td>89
-<td>89
-<td>89
-<td>89
-<td>89
-<td>89
-<td>89
-<td>88
-<td>85
-<tr>
-<td>CFSAN000211
-<td>82
-<td>54
-<td>0
-<td>1
-<td>45
-<td>91
-<td>91
-<td>92
-<td>91
-<td>91
-<td>91
-<td>91
-<td>92
-<td>91
-<td>92
-<td>91
-<td>91
-<td>91
-<td>91
-<td>91
-<td>91
-<td>91
-<td>90
-<td>87
-<tr>
-<td>CFSAN000212
-<td>83
-<td>55
-<td>1
-<td>0
-<td>46
-<td>92
-<td>92
-<td>93
-<td>92
-<td>92
-<td>92
-<td>92
-<td>93
-<td>92
-<td>93
-<td>92
-<td>92
-<td>92
-<td>92
-<td>92
-<td>92
-<td>92
-<td>91
-<td>88
-<tr>
-<td>CFSAN000228
-<td>71
-<td>27
-<td>45
-<td>46
-<td>0
-<td>80
-<td>80
-<td>81
-<td>80
-<td>80
-<td>80
-<td>80
-<td>81
-<td>80
-<td>81
-<td>80
-<td>80
-<td>80
-<td>80
-<td>80
-<td>80
-<td>80
-<td>79
-<td>76
-<tr>
-<td>CFSAN000661
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000669
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000700
-<td>16
-<td>90
-<td>92
-<td>93
-<td>81
-<td>1
-<td>1
-<td>0
-<td>1
-<td>1
-<td>1
-<td>1
-<td>2
-<td>1
-<td>2
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>2
-<td>21
-<tr>
-<td>CFSAN000752
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000753
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000951
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000952
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000954
-<td>16
-<td>90
-<td>92
-<td>93
-<td>81
-<td>1
-<td>1
-<td>2
-<td>1
-<td>1
-<td>1
-<td>1
-<td>0
-<td>1
-<td>2
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>2
-<td>21
-<tr>
-<td>CFSAN000958
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000960
-<td>16
-<td>90
-<td>92
-<td>93
-<td>81
-<td>1
-<td>1
-<td>2
-<td>1
-<td>1
-<td>1
-<td>1
-<td>2
-<td>1
-<td>0
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>2
-<td>21
-<tr>
-<td>CFSAN000961
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000963
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000968
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN000970
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN001112
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN001115
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN001118
-<td>15
-<td>89
-<td>91
-<td>92
-<td>80
-<td>0
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>0
-<td>1
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>0
-<td>1
-<td>20
-<tr>
-<td>CFSAN001140
-<td>14
-<td>88
-<td>90
-<td>91
-<td>79
-<td>1
-<td>1
-<td>2
-<td>1
-<td>1
-<td>1
-<td>1
-<td>2
-<td>1
-<td>2
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>1
-<td>0
-<td>19
-<tr>
-<td>Reference
-<td>5
-<td>85
-<td>87
-<td>88
-<td>76
-<td>20
-<td>20
-<td>21
-<td>20
-<td>20
-<td>20
-<td>20
-<td>21
-<td>20
-<td>21
-<td>20
-<td>20
-<td>20
-<td>20
-<td>20
-<td>20
-<td>20
-<td>19
-<td>0
+  {% for its in snp_dists.body %}
+  <tr>
+    {% for item in its %}
+    <td>{{ item }}</td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
 </tbody><caption><span class='file-download-bar'>Download:  <a href='snpdist.csv' class='file-download'>&#11015;snpdist.csv</a></span>
 </caption>
 </table>
-</div>
-
-<div class='container-fluid nullarbor-section' id='snpdensity'>
-<a name='snpdensity'></a>
-<h2>{% include "menu.html" %}
-Core SNP density <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-
-<div id='snpdensity-histogram'>
-</div>
-<script>
-var nums = [ 115714,147186,190695,221363,222020,268434,309014,309657,351109,388919,432510,446060,464220,465176,476531,694650,704733,718062,733360,878241,905220,912619,923276,967467,1015763,1030248,1059978,1076268,1179395,1189914,1190541,1233305,1273696,1279248,1316753,1317771,1338972,1372881,1410442,1477062,1501503,1598998,1598999,1599000,1599002,1599003,1600370,1605352,1605483,1625798,1626011,1663837,1684749,1772510,1827978,1864060,1886151,1951156,1973429,1981427,2045923,2049977,2063323,2117089,2138539,2149430,2186376,2338280,2343189,2347353,2355963,2413415,2461670,2582583,2632351,2640466,2670947,2671074,2675746,2676641,2828112,2830783,2849335,2873458,2972040,3020371,3031897,3035764,3049370,3062994,3064123,3099320,3100282,3109307,3123614,3131401,3147245,3156924,3165412,3212866,3240014,3254748,3279654,3378315,3410835,3455786,3457068,3494480,3498776,3563229,3611090,3692597,3737503,3783558,3914835,3984427,3988607,3990551,4085764,4101031,4124394,4152047,4173667,4200049,4204834,4230608,4236579,4244984,4327861,4331351,4382734,4388162,4414258,4485329,4599214,4605293,4660311,4708247 ];
-var data = [ { 
-  type: 'histogram',
-  x: nums, 
-//  autobinx: false,
-//  xbins: { start: 0, end: 4708247, size: 1 },
-} ];
-var layout = {
-  title: '138 SNPs across 4808805 bp',
-  xaxis: { title: 'Genome position' },
-  yaxis: { title: 'SNPs' },
-};
-Plotly.newPlot('snpdensity-histogram', data, layout);
-</script>
 </div>
 
 <div class='container-fluid nullarbor-section' id='pan'>
@@ -1296,152 +638,23 @@ Pan genome <a href='#' class='jump-home'>&#x25B2;</a> </h2>
 </table>
 
 <p class='container-fluid'>
-<svg viewBox="0 0 1024 392" width='1024' height='392' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' ><defs><style type='text/css'><![CDATA[
- .leaf-label {font-size:12;font-family:sans-serif;}
- .inner-label {opacity:0}
- .edge-label {opacity:0}
-]]></style></defs>
-<!-- arguments: -S -s -w 1024 -l font-size:12;font-family:sans-serif; -i opacity:0 -b opacity:0 -v 16 roary/accessory_binary_genes.fa.newick  -->
-<g transform='translate(0,20)'><g  style='stroke:black;fill:none;stroke-width:1;stroke-linecap:round'><line class='clade_0' x1='17.9128' y1='0.0000' x2='45.4750' y2='0.0000'/><line class='clade_0' x1='17.9128' y1='16.0000' x2='20.4000' y2='16.0000'/><line class='clade_0' x1='17.9128' y1='0.0000' x2='17.9128' y2='16.0000'/><line class='clade_0' x1='15.4200' y1='8.0000' x2='17.9128' y2='8.0000'/><line class='clade_0' x1='30.2899' y1='32.0000' x2='45.4504' y2='32.0000'/><line class='clade_0' x1='883.1411' y1='48.0000' x2='911.1746' y2='48.0000'/><line class='clade_0' x1='892.9711' y1='64.0000' x2='895.5482' y2='64.0000'/><line class='clade_0' x1='892.9711' y1='80.0000' x2='926.0000' y2='80.0000'/><line class='clade_0' x1='892.9711' y1='64.0000' x2='892.9711' y2='80.0000'/><line class='clade_0' x1='883.1411' y1='72.0000' x2='892.9711' y2='72.0000'/><line class='clade_0' x1='883.1411' y1='48.0000' x2='883.1411' y2='72.0000'/><line class='clade_0' x1='875.4109' y1='60.0000' x2='883.1411' y2='60.0000'/><line class='clade_0' x1='875.4109' y1='96.0000' x2='879.9366' y2='96.0000'/><line class='clade_0' x1='875.4109' y1='60.0000' x2='875.4109' y2='96.0000'/><line class='clade_0' x1='30.2899' y1='78.0000' x2='875.4109' y2='78.0000'/><line class='clade_0' x1='30.2899' y1='112.0000' x2='39.8018' y2='112.0000'/><line class='clade_0' x1='30.2899' y1='78.0000' x2='30.2899' y2='112.0000'/><line class='clade_0' x1='30.2899' y1='95.0000' x2='30.2899' y2='95.0000'/><line class='clade_0' x1='30.2899' y1='32.0000' x2='30.2899' y2='95.0000'/><line class='clade_0' x1='24.4510' y1='63.5000' x2='30.2899' y2='63.5000'/><line class='clade_0' x1='35.7334' y1='128.0000' x2='47.3750' y2='128.0000'/><line class='clade_0' x1='46.8786' y1='144.0000' x2='75.5443' y2='144.0000'/><line class='clade_0' x1='46.8786' y1='160.0000' x2='59.1163' y2='160.0000'/><line class='clade_0' x1='46.8786' y1='144.0000' x2='46.8786' y2='160.0000'/><line class='clade_0' x1='35.7334' y1='152.0000' x2='46.8786' y2='152.0000'/><line class='clade_0' x1='35.7334' y1='128.0000' x2='35.7334' y2='152.0000'/><line class='clade_0' x1='24.4510' y1='140.0000' x2='35.7334' y2='140.0000'/><line class='clade_0' x1='24.4510' y1='63.5000' x2='24.4510' y2='140.0000'/><line class='clade_0' x1='15.4200' y1='101.7500' x2='24.4510' y2='101.7500'/><line class='clade_0' x1='15.4200' y1='8.0000' x2='15.4200' y2='101.7500'/><line class='clade_0' x1='10.0000' y1='54.8750' x2='15.4200' y2='54.8750'/><line class='clade_0' x1='18.0797' y1='176.0000' x2='45.9040' y2='176.0000'/><line class='clade_0' x1='55.4131' y1='192.0000' x2='85.0390' y2='192.0000'/><line class='clade_0' x1='55.4131' y1='208.0000' x2='88.1334' y2='208.0000'/><line class='clade_0' x1='55.4131' y1='192.0000' x2='55.4131' y2='208.0000'/><line class='clade_0' x1='38.5825' y1='200.0000' x2='55.4131' y2='200.0000'/><line class='clade_0' x1='38.5825' y1='224.0000' x2='56.3593' y2='224.0000'/><line class='clade_0' x1='38.5825' y1='200.0000' x2='38.5825' y2='224.0000'/><line class='clade_0' x1='33.6742' y1='212.0000' x2='38.5825' y2='212.0000'/><line class='clade_0' x1='39.1932' y1='240.0000' x2='83.8020' y2='240.0000'/><line class='clade_0' x1='56.5621' y1='256.0000' x2='133.2806' y2='256.0000'/><line class='clade_0' x1='56.5621' y1='272.0000' x2='82.6313' y2='272.0000'/><line class='clade_0' x1='56.5621' y1='256.0000' x2='56.5621' y2='272.0000'/><line class='clade_0' x1='39.1932' y1='264.0000' x2='56.5621' y2='264.0000'/><line class='clade_0' x1='39.1932' y1='240.0000' x2='39.1932' y2='264.0000'/><line class='clade_0' x1='33.6742' y1='252.0000' x2='39.1932' y2='252.0000'/><line class='clade_0' x1='33.6742' y1='212.0000' x2='33.6742' y2='252.0000'/><line class='clade_0' x1='18.0797' y1='232.0000' x2='33.6742' y2='232.0000'/><line class='clade_0' x1='18.0797' y1='176.0000' x2='18.0797' y2='232.0000'/><line class='clade_0' x1='10.0000' y1='204.0000' x2='18.0797' y2='204.0000'/><line class='clade_0' x1='13.1297' y1='288.0000' x2='26.6623' y2='288.0000'/><line class='clade_0' x1='28.6610' y1='304.0000' x2='70.7474' y2='304.0000'/><line class='clade_0' x1='35.1767' y1='320.0000' x2='88.3673' y2='320.0000'/><line class='clade_0' x1='49.6886' y1='336.0000' x2='73.0935' y2='336.0000'/><line class='clade_0' x1='49.6886' y1='352.0000' x2='78.4195' y2='352.0000'/><line class='clade_0' x1='49.6886' y1='336.0000' x2='49.6886' y2='352.0000'/><line class='clade_0' x1='35.1767' y1='344.0000' x2='49.6886' y2='344.0000'/><line class='clade_0' x1='35.1767' y1='320.0000' x2='35.1767' y2='344.0000'/><line class='clade_0' x1='28.6610' y1='332.0000' x2='35.1767' y2='332.0000'/><line class='clade_0' x1='28.6610' y1='304.0000' x2='28.6610' y2='332.0000'/><line class='clade_0' x1='13.1297' y1='318.0000' x2='28.6610' y2='318.0000'/><line class='clade_0' x1='13.1297' y1='288.0000' x2='13.1297' y2='318.0000'/><line class='clade_0' x1='10.0000' y1='303.0000' x2='13.1297' y2='303.0000'/><line class='clade_0' x1='10.0000' y1='54.8750' x2='10.0000' y2='303.0000'/><line x1='0' y1='178.9375' x2='10.0000' y2='178.9375'/></g><g style='stroke:none'><text class='leaf-label' x='55.4750' y='4.0000'>CFSAN000952</text><text class='edge-label' x='31.693876' y='-4.000000'>0.068305302</text><text class='leaf-label' x='30.4000' y='20.0000'>CFSAN000961</text><text class='edge-label' x='19.156380' y='12.000000'>0.006163780</text><text class='inner-label' x='27.9128' y='12.0000'>0.262</text><text class='edge-label' x='16.666418' y='4.000000'>0.006177599</text><text class='leaf-label' x='55.4504' y='36.0000'>CFSAN000669</text><text class='edge-label' x='37.870138' y='28.000000'>0.037571296</text><text class='leaf-label' x='921.1746' y='52.0000'>CFSAN000191</text><text class='edge-label' x='897.157843' y='44.000000'>0.069473239</text><text class='leaf-label' x='905.5482' y='68.0000'>CFSAN000211</text><text class='edge-label' x='894.259641' y='60.000000'>0.006386759</text><text class='leaf-label' x='936.0000' y='84.0000'>CFSAN000212</text><text class='edge-label' x='909.485533' y='76.000000'>0.081853195</text><text class='inner-label' x='902.9711' y='76.0000'>0.561</text><text class='edge-label' x='888.056094' y='68.000000'>0.024360837</text><text class='inner-label' x='893.1411' y='64.0000'>0.708</text><text class='edge-label' x='879.276020' y='56.000000'>0.019157199</text><text class='leaf-label' x='889.9366' y='100.0000'>CFSAN000228</text><text class='edge-label' x='877.673765' y='92.000000'>0.011215699</text><text class='inner-label' x='885.4109' y='82.0000'>1.000</text><text class='edge-label' x='452.850390' y='74.000000'>2.094401846</text><text class='leaf-label' x='49.8018' y='116.0000'>CFSAN000753</text><text class='edge-label' x='35.045808' y='108.000000'>0.023572625</text><text class='inner-label' x='40.2899' y='99.0000'>0.014</text><text class='edge-label' x='30.289862' y='91.000000'>0.000000005</text><text class='inner-label' x='40.2899' y='67.5000'>0.351</text><text class='edge-label' x='27.370412' y='59.500000'>0.014470114</text><text class='leaf-label' x='57.3750' y='132.0000'>CFSAN000189</text><text class='edge-label' x='41.554198' y='124.000000'>0.028850331</text><text class='leaf-label' x='85.5443' y='148.0000'>CFSAN000951</text><text class='edge-label' x='61.211462' y='140.000000'>0.071039937</text><text class='leaf-label' x='69.1163' y='164.0000'>CFSAN000960</text><text class='edge-label' x='52.997463' y='156.000000'>0.030327628</text><text class='inner-label' x='56.8786' y='156.0000'>0.781</text><text class='edge-label' x='41.306043' y='148.000000'>0.027620360</text><text class='inner-label' x='45.7334' y='144.0000'>0.834</text><text class='edge-label' x='30.092201' y='136.000000'>0.027960535</text><text class='inner-label' x='34.4510' y='105.7500'>0.870</text><text class='edge-label' x='19.935503' y='97.750000'>0.022380668</text><text class='inner-label' x='25.4200' y='58.8750'>0.857</text><text class='edge-label' x='12.710022' y='50.875000'>0.013432099</text><text class='leaf-label' x='55.9040' y='180.0000'>CFSAN001112</text><text class='edge-label' x='31.991855' y='172.000000'>0.068954783</text><text class='leaf-label' x='95.0390' y='196.0000'>CFSAN000700</text><text class='edge-label' x='70.226039' y='188.000000'>0.073419651</text><text class='leaf-label' x='98.1334' y='212.0000'>CFSAN000954</text><text class='edge-label' x='71.773234' y='204.000000'>0.081088251</text><text class='inner-label' x='65.4131' y='204.0000'>0.851</text><text class='edge-label' x='46.997782' y='196.000000'>0.041710138</text><text class='leaf-label' x='66.3593' y='228.0000'>CFSAN001115</text><text class='edge-label' x='47.470903' y='220.000000'>0.044055140</text><text class='inner-label' x='48.5825' y='216.0000'>0.564</text><text class='edge-label' x='36.128355' y='208.000000'>0.012163679</text><text class='leaf-label' x='93.8020' y='244.0000'>CFSAN000661</text><text class='edge-label' x='61.497596' y='236.000000'>0.110550872</text><text class='leaf-label' x='143.2806' y='260.0000'>CFSAN001118</text><text class='edge-label' x='94.921351' y='252.000000'>0.190125900</text><text class='leaf-label' x='92.6313' y='276.0000'>CFSAN001140</text><text class='edge-label' x='69.596680' y='268.000000'>0.064605330</text><text class='inner-label' x='66.5621' y='268.0000'>0.892</text><text class='edge-label' x='47.877631' y='260.000000'>0.043044140</text><text class='inner-label' x='49.1932' y='256.0000'>0.304</text><text class='edge-label' x='36.433707' y='248.000000'>0.013677143</text><text class='inner-label' x='43.6742' y='236.0000'>0.926</text><text class='edge-label' x='25.876990' y='228.000000'>0.038646739</text><text class='inner-label' x='28.0797' y='208.0000'>0.868</text><text class='edge-label' x='14.039867' y='200.000000'>0.020023417</text><text class='leaf-label' x='36.6623' y='292.0000'>CFSAN000958</text><text class='edge-label' x='19.896007' y='284.000000'>0.033536900</text><text class='leaf-label' x='80.7474' y='308.0000'>CFSAN000968</text><text class='edge-label' x='49.704207' y='300.000000'>0.104299478</text><text class='leaf-label' x='98.3673' y='324.0000'>CFSAN000970</text><text class='edge-label' x='61.772005' y='316.000000'>0.131818493</text><text class='leaf-label' x='83.0935' y='340.0000'>CFSAN000752</text><text class='edge-label' x='61.391049' y='332.000000'>0.058002648</text><text class='leaf-label' x='88.4195' y='356.0000'>CFSAN000963</text><text class='edge-label' x='64.054064' y='348.000000'>0.071201757</text><text class='inner-label' x='59.6886' y='348.0000'>0.324</text><text class='edge-label' x='42.432642' y='340.000000'>0.035963827</text><text class='inner-label' x='45.1767' y='336.0000'>0.150</text><text class='edge-label' x='31.918863' y='328.000000'>0.016147235</text><text class='inner-label' x='38.6610' y='322.0000'>0.931</text><text class='edge-label' x='20.895371' y='314.000000'>0.038490198</text><text class='inner-label' x='23.1297' y='307.0000'>0.764</text><text class='edge-label' x='11.564849' y='299.000000'>0.007756103</text></g></g></svg>
 
 </p>
 </div>
 
-<div class='container-fluid nullarbor-section' id='tools'>
-<a name='tools'></a>
-<h2><span class='dropdown'>
-<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>&#9776;</button>
-<ul class='dropdown-menu'><li><a href='#jobinfo'>Report summary</a>
-<li><a href='#seqdata'>Sequence data</a>
-<li><a href='#identification'>Species identification</a>
-<li><a href='#mlst'>MLST</a>
-<li><a href='#resistome'>Resistome</a>
-<li><a href='#virulome'>Virulome</a>
-<li><a href='#assembly'>Assembly and annotation</a>
-<li><a href='#reference'>Reference genome</a>
-<li><a href='#core'>Core genome</a>
-<li><a href='#phylotree'>Core SNP Phylogeny</a>
-<li><a href='#snpdist'>Pairwise core SNP distances</a>
-<li><a href='#snpdensity'>Core SNP density</a>
-<li><a href='#pan'>Pan genome</a>
-<li><a href='#tools'>Software versions</a>
-<li><a href='#databases'>Databases</a>
-<li><a href='#about'>About</a>
-</ul></span>
-Software versions <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-<table id='tools' class='table table-bordered table-condensed'>
-<thead>
-<tr>
-<th>Tool
-<th>Version
-</thead>
-<tbody>
-<tr>
-<td>Abricate
-<td>0.8.7
-<tr>
-<td>BWA MEM
-<td>0.7.17-r1188
-<tr>
-<td>FastTree
-<td>2.1.10 Double precision (No SSE3), OpenMP (72 threads):
-<tr>
-<td>FreeBayes
-<td>1.2.0-dirty
-<tr>
-<td>IQtree
-<td>1.6.5 for Linux 64-bit built May 11 2018
-<tr>
-<td>Kraken
-<td>1.0
-<tr>
-<td>MLST
-<td>2.15.1
-<tr>
-<td>MegaHit
-<td>1.1.3
-<tr>
-<td>Newick-Utils
-<td>1.6
-<tr>
-<td>Nullarbor
-<td>2.0.20180909
-<tr>
-<td>Prokka
-<td>1.13.3
-<tr>
-<td>Roary
-<td>3.12.0
-<tr>
-<td>SAMtools
-<td>1.9
-<tr>
-<td>SKESA
-<td>2.2
-<tr>
-<td>SPAdes
-<td>3.12.0
-<tr>
-<td>Shovill
-<td>1.0.1
-<tr>
-<td>Snippy
-<td>4.1.1
-<tr>
-<td>Trimmomatic
-<td>0.38
-<tr>
-<td>centrifuge
-<td>1.0.3-beta
-<tr>
-<td>seqret
-<td>6.6.0.0
-<tr>
-<td>seqtk
-<td>1.3-r106
-<tr>
-<td>snp-dists
-<td>0.6
-</tbody><caption><span class='file-download-bar'>Download:  <a href='tools.csv' class='file-download'>&#11015;tools.csv</a></span>
-</caption>
-</table>
+<div class='container-fluid nullarbor-section' id='about'>
+  <a name='about'></a>
+  <h2>{% include "menu.html" %}
+    About <a href='#' class='jump-home'>&#x25B2;</a> </h2>
+
+  <ul class='list-unstyled'>
+    <li>Metagenomics workflow for <a href="https://github.com/bio-ontology-research-group/mrsa-sequences">MRSA Sequences</a></li>
+    <li>Based on <a href="https://github.com/tseemann/nullarbor">Github</a>.</li>
+    <li>Please report bugs at
+    the <a href="https://github.com/bio-ontology-research-group/mrsa-sequences">MRSA Sequences</a>.</li>
+  </ul>
 </div>
-
-<div class='container-fluid nullarbor-section' id='databases'>
-<a name='databases'></a>
-<h2>{% include "menu.html" %}
-Databases <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-<table id='databases' class='table table-bordered table-condensed'>
-<thead>
-<tr>
-<th>Database
-<th>Name
-<th>Date
-</thead>
-<tbody>
-<tr>
-<td>Kraken
-<td>minikraken_20171019_8GB
-<td>2017-10-20
-<tr>
-<td>mlst
-<td>mlst.fa
-<td>2018-09-10
-</tbody><caption><span class='file-download-bar'>Download:  <a href='databases.csv' class='file-download'>&#11015;databases.csv</a></span>
-</caption>
-</table>
-</div><div class='container-fluid nullarbor-section' id='about'>
-<a name='about'></a>
-<h2>{% include "menu.html" %}
-About <a href='#' class='jump-home'>&#x25B2;</a> </h2>
-
-<ul class='list-unstyled'>
-<li>This primary author of Nullarbor is <a href="http://tseemann.github.io/">Torsten Seemann</a>.
-<li>You can download the software from <a href="https://github.com/tseemann/nullarbor">Github</a>.
-<li>Please report bugs at the <a href="https://github.com/tseemann/nullarbor/issues">Nullarbor Issue Tracker</a>.
-<li>If you use Nullarbor please use the <a href="https://github.com/tseemann/nullarbor/#citation">latest citation</a>.
-</ul>
-  </div></div>
+</div>
  
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->

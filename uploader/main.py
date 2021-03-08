@@ -100,14 +100,14 @@ def main(uploader_project, sequence_read1, sequence_read2, metadata_file):
         username = "unknown"
 
     properties = {
-        "sequence_label": metadata['sample'],
+        "sequence_label": metadata['sample']['sample_id'],
         "upload_app": "mrsa_uploader",
         "upload_ip": external_ip,
         "upload_user": "%s@%s" % (username, socket.gethostname())
     }
 
     col.save_new(owner_uuid=uploader_project, name="%s uploaded by %s from %s" %
-                 (metadata['sample'], properties['upload_user'], properties['upload_ip']),
+                 (metadata['sample']['sample_id'], properties['upload_user'], properties['upload_ip']),
                  properties=properties, ensure_unique_name=True)
 
     print(json.dumps(col.api_response()))

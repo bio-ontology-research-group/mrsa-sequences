@@ -70,7 +70,7 @@ def submit_new_request(
         },
         "snippy_ref": {
             "class": "File",
-            "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+            "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.fasta"
         },
         "sample_id": sample_id
     }
@@ -157,92 +157,126 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
     pangenome_data = []
     report_data = {'kraken': [], 'mlst': [], 'resistome': [], 'virulome': [], 'prokka': []}
     update_pangenome = False
-    for it in reads[1:]:
-        col = api.collections().get(uuid=it['uuid']).execute()
-        if 'sequence_label' not in it['properties']:
-            continue
-        sample_id = it['properties']['sequence_label']
-        if 'analysis_status' in it['properties']:
-            pangenome_data.append((sample_id, col['portable_data_hash']))
-            col_reader = CollectionReader(col['uuid'])
-            report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
-            report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
-            report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
-            report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
-            report_data['prokka'].append((sample_id, get_prokka_report(col_reader)))
-        continue
-        if sample_id not in state:
-            state[sample_id] = {
-                'status': 'new',
-                'container_request': None,
-                'output_collection': None,
-            }
-        sample_state = state[sample_id]
-        if sample_state['status'] == 'new':
-            container_request, status = submit_new_request(
-                api, workflows_project, metagenome_workflow_uuid, sample_id,
-                it['portable_data_hash'])
-            sample_state['status'] = status
-            sample_state['container_request'] = container_request
-            print(f'Submitted analysis request for {sample_id}')
-        elif sample_state['status'] == 'submitted':
-            # TODO: check container request status
-            if sample_state['container_request'] is None:
-                raise Exception("Container request cannot be empty when status is submitted")
-            cr = api.container_requests().get(
-                uuid=sample_state["container_request"]).execute()
-            cr_state = get_cr_state(api, cr)
-            print(f'Container request for {sample_id} is {cr_state}')
-            if cr_state == 'Complete':
-                out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
-                sample_state['output_collection'] = cr["output_uuid"]
-                sample_state['status'] = 'complete'
-                # Copy output files to reads collection
-                it['properties']['analysis_status'] = 'complete'
-                api.collections().update(
-                    uuid=it['uuid'],
-                    body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],
-                          "properties": it["properties"]}).execute()
-                pangenome_data.append((sample_id, col['portable_data_hash']))
-                update_pangenome = True
-            elif cr_state == 'Failed':
+    proc_cnt = 0
+    try:
+        for it in reads[1:]:
+            col = api.collections().get(uuid=it['uuid']).execute()
+            if 'sequence_label' not in it['properties']:
+                continue
+            sample_id = it['properties']['sequence_label']
+            if sample_id not in state:
                 state[sample_id] = {
                     'status': 'new',
                     'container_request': None,
                     'output_collection': None,
-        
                 }
-        elif sample_state['status'] == 'complete':
-            # TODO: do nothing
-            pass
-    if update_pangenome:
-        container_request, status = submit_pangenome(api, workflows_project, pangenome_workflow_uuid, pangenome_data)
-        if status == 'submitted':
-            state['last_pangenome_request'] = container_request
-            state['last_pangenome_request_status'] = 'submitted'
-            print('Submitted pangenome request', container_request)
-    else:
-        cr = api.container_requests().get(
-            uuid=state["last_pangenome_request"]).execute()
-        cr_state = get_cr_state(api, cr)
-        print(f'Container request for pangenome workflow is {cr_state}')
-        if state['last_pangenome_request_status'] == 'submitted' and cr_state == 'Complete':
-            print('Updating results collection')
-            out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
-            api.collections().update(
-                uuid=pangenome_result_col_uuid,
-                body={"manifest_text": out_col["manifest_text"]}).execute()
-            state['last_pangenome_request_status'] = 'complete'
+            sample_state = state[sample_id]
+            if sample_state['status'] == 'complete':
+                pangenome_data.append((sample_id, col['portable_data_hash']))
+                col_reader = CollectionReader(col['uuid'])
+                report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
+                report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
+                report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
+                report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
+                report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
+            if sample_state['status'] == 'new':
+                if proc_cnt == 10: # Do not submit more than 10 jobs
+                    continue
+                container_request, status = submit_new_request(
+                    api, workflows_project, metagenome_workflow_uuid, sample_id,
+                    it['portable_data_hash'])
+                sample_state['status'] = status
+                sample_state['container_request'] = container_request
+                print(f'Submitted analysis request for {sample_id}')
+                proc_cnt += 1
+            elif sample_state['status'] == 'submitted':
+                # TODO: check container request status
+                if sample_state['container_request'] is None:
+                    raise Exception("Container request cannot be empty when status is submitted")
+                try:
+                    cr = api.container_requests().get(
+                        uuid=sample_state["container_request"]).execute()
+                    cr_state = get_cr_state(api, cr)
+                except Exception as e:
+                    print(e)
+                    cr_state = 'Failed'
+                    print(f'Container request for {sample_id} is {cr_state}')
+                if cr_state == 'Complete':
+                    out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
+                    sample_state['output_collection'] = cr["output_uuid"]
+                    sample_state['status'] = 'complete'
+                    # Copy output files to reads collection
+                    it['properties']['analysis_status'] = 'complete'
+                    res = api.collections().update(
+                        uuid=it['uuid'],
+                        body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],
+                              "properties": it["properties"]}).execute()
+                    update_pangenome = True
+                elif cr_state == 'Failed':
+                    state[sample_id] = {
+                        'status': 'new',
+                        'container_request': None,
+                        'output_collection': None,
 
-    col_reader = CollectionReader(pangenome_result_col_uuid)
-    report_data["iqtree"] = get_iqtree_result(col_reader)
-    report_data["roary_svg"] = get_roary_svg(col_reader)
-    report_data["roary_stats"] = get_roary_stats(col_reader)
-    generate_report(report_data)
-    
+                    }
+            elif sample_state['status'] == 'complete':
+                # TODO: do nothing
+                pass
+        if update_pangenome:
+            container_request, status = submit_pangenome(api, workflows_project, pangenome_workflow_uuid, pangenome_data)
+            if status == 'submitted':
+                state['last_pangenome_request'] = container_request
+                state['last_pangenome_request_status'] = 'submitted'
+                print('Submitted pangenome request', container_request)
+        else:
+            cr = api.container_requests().get(
+                uuid=state["last_pangenome_request"]).execute()
+            cr_state = get_cr_state(api, cr)
+            print(f'Container request for pangenome workflow is {cr_state}')
+            if state['last_pangenome_request_status'] == 'submitted' and cr_state == 'Complete':
+                print('Updating results collection')
+                out_col = api.collections().get(uuid=cr["output_uuid"]).execute()
+                api.collections().update(
+                    uuid=pangenome_result_col_uuid,
+                    body={"manifest_text": out_col["manifest_text"]}).execute()
+                state['last_pangenome_request_status'] = 'complete'
+
+        col_reader = CollectionReader(pangenome_result_col_uuid)
+        report_data["iqtree"] = get_iqtree_result(col_reader)
+        report_data["roary_svg"] = get_roary_svg(col_reader)
+        report_data["roary_stats"] = get_roary_stats(col_reader)
+        snp_dists, hist_data = get_snp_dists(col_reader)
+        report_data["snp_dists"] = snp_dists
+        report_data["snp_hist"] = {'nums': json.dumps(hist_data), 'start': 0, 'end': max(hist_data)}
+        report_data["core"] = get_core_genome(col_reader)
+        generate_report(report_data)
+    except Exception as e:
+        print(e)
+
     with open('state.json', 'w') as f:
         f.write(json.dumps(state))
 
+def get_core_genome(col):
+    result = []
+    with col.open('core.txt') as f:
+        next(f)
+        for line in f:
+            it = list(line.strip().split('\t'))
+            it.append(round(float(it[2]) / float(it[1]) * 100, 2))
+            result.append(it)
+    return result
+
+def get_snp_dists(col):
+    result = {'body': []}
+    hist_data = []
+    with col.open('core.full.tab') as f:
+        result['header'] = next(f).strip().split('\t')
+        for line in f:
+            it = line.strip().split('\t')
+            result['body'].append(it)
+            hist_data += list(map(int, it[1:]))
+    return result, hist_data
+    
 def get_roary_svg(col):
     with col.open('gene_presence_absence.svg') as f:
         return f.read().strip()
@@ -300,9 +334,15 @@ def get_virulome_report(col):
             result.append((it[5], float(it[9])))
     return result
 
-def get_prokka_report(col):
+def get_prokka_report(col, sample_id):
     result = {}
-    with col.open('prokka/prokka.txt', "r") as f:
+    filename = 'prokka/prokka.txt'
+    try:
+        f = col.open(filename, 'r')
+        f.close()
+    except Exception as e:
+        filename = f'prokka/{sample_id}.txt'
+    with col.open(filename, "r") as f:
         next(f)
         for line in f:
             it = line.strip().split(': ')

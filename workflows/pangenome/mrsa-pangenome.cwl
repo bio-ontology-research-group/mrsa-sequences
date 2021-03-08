@@ -18,6 +18,9 @@ outputs:
   alignment:
     type: File
     outputSource: snippyCore/alignments
+  alignmentStats:
+    type: File
+    outputSource: snippyCore/outputTxt
   snp_dists:
     type: File
     outputSource: snpDists/distances
@@ -51,7 +54,7 @@ steps:
       dirs: dirs
       reference: reference
       inprefix: snippy_inprefix
-    out: [alignments,outputVcf]
+    out: [alignments,outputVcf,outputTxt]
     run: snippy-core.cwl
   iqTree:
     in:

@@ -6,7 +6,7 @@ host:
 sample:
     sample_id: XX
     collection_date: "2020-01-01"
-    collection_location: http://www.wikidata.org/entity/Q148
+    collection_location: http://www.wikidata.org/entity/Q851
 
 bacteria:
     bacteria_species: http://purl.obolibrary.org/obo/NCBITaxon_1280
