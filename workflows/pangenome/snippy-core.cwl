@@ -10,7 +10,7 @@ requirements:
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
     coresMin: 16
-    ramMin: 60000
+    ramMin: 120000
 
 baseCommand: snippy-core
 

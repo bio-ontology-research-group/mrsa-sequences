@@ -28,7 +28,7 @@ inputs:
       prefix: --cores
   memory:
     type: int?
-    default: 30
+    default: 60
     inputBinding:
       prefix: --memory
 
