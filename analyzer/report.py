@@ -9,4 +9,11 @@ def generate_report(data):
     report = template.render(data)
     with open('result.html', 'w') as f:
         f.write(report)
+
+    with open('data/result_csvs/identification.csv', 'w') as f:
+        for sample_id, data in data['kraken']:
+            f.write(sample_id)
+            for p, _, name in data:
+                f.write(f',{name},{p}')
+            f.write('\n')
     

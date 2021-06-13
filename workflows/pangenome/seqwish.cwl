@@ -6,10 +6,10 @@ class: CommandLineTool
 requirements:
   InlineJavascriptRequirement: {}
   DockerRequirement:
-    dockerPull: "quay.io/biocontainers/seqwish:0.4.1--h8b12597_0"
+    dockerPull: "quay.io/biocontainers/seqwish:0.4.1--h2e03b76_1"
   ResourceRequirement:
-    coresMin: 8
-    ramMin: 24000
+    coresMin: 16
+    ramMin: 250000
 
 baseCommand: seqwish
 

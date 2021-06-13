@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import click as ck
 import arvados
 from arvados.collection import CollectionReader
@@ -13,6 +14,11 @@ import socket
 import subprocess
 import tempfile
 import logging
+import traceback
+
+sys.path.insert(0, '')
+
+
 from analyzer.report import generate_report
 
 
@@ -151,11 +157,13 @@ def submit_pangenome(
 @ck.option('--metagenome-workflow-uuid', '-mwid', default='cborg-7fd4e-3ig4fl4bz90uydt', help='Metagenome workflow uuid')
 @ck.option('--pangenome-workflow-uuid', '-pwid', default='cborg-7fd4e-qhxoc5ddgrti3tq', help='Pangenome workflow uuid')
 @ck.option('--pangenome-result-col-uuid', '-prcid', default='cborg-4zz18-5e3rl41vfzpqs9q', help='Pangenome workflow uuid')
-def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_workflow_uuid, pangenome_result_col_uuid): 
+@ck.option('--fastq-result-project', '-frp', default='cborg-j7d0g-3udc153j2uo6bs2', help='MRSA FASTQ sequences project uuid')
+def main(fastq_project, workflows_project, metagenome_workflow_uuid,
+         pangenome_workflow_uuid, pangenome_result_col_uuid, fastq_result_project): 
     logging.info("Starting a analysis run")
 
     api = arvados.api('v1', host=ARVADOS_API_HOST, token=ARVADOS_API_TOKEN)
-    col = arvados.collection.Collection(api_client=api)
+    col = arvados.collection.Collection(api_client=api, num_retries=5)
     state = {}
     if os.path.exists('state.json'):
         state = json.loads(open('state.json').read())
@@ -164,11 +172,22 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
     report_data = {'kraken': [], 'mlst': [], 'resistome': [], 'virulome': [], 'prokka': []}
     update_pangenome = False
     proc_cnt = 0
+    bad_samples = set([
+        'MRSA095', 'MRSA096', 'MRSA097', 'MRSA098', 'MRSA099', 'MRSA100',
+        'MRSA101', 'MRSA102', 'MRSA117', 'MRSA118', 'MRSA124', 'MRSA133',
+        'MRSA187', 'MRSA261', 'MRSA314', 'MRSA355', 'MRSA357', 'MRSA360',
+        'MRSA361', 'MRSA390', 'MRSA420', 'MRSA422', 'MRSA477',
+        'MRSA028', 'MRSA070', 'MRSA116', 'MRSA179', 'MRSA243', 'MRSA270',
+        'MRSA372', 'MRSA384', 'MRSA413', 'MRSA442', 'MRSA478', 'MRSA480',
+        'MRSA481', 'MRSA490', 'MRSA491', 'MRSA500', 'MRSA501', 'MRSA502', 'MRSA503',
+        'MRSA088', 'MRSA112', 'MRSA260',
+    ])
     try:
         for it in reads[1:]:
             col = api.collections().get(uuid=it['uuid']).execute()
             if 'sequence_label' not in it['properties']:
                 continue
+
             sample_id = it['properties']['sequence_label']
             if sample_id not in state:
                 state[sample_id] = {
@@ -178,13 +197,21 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                 }
             sample_state = state[sample_id]
             if sample_state['status'] == 'complete':
-                pangenome_data.append((sample_id, col['portable_data_hash']))
-                col_reader = CollectionReader(col['uuid'])
-                report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
-                report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
-                report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
-                report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
-                report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
+                out_col = api.collections().get(
+                    uuid=sample_state['output_collection']).execute()
+                if sample_id not in bad_samples:
+
+                    pangenome_data.append((sample_id, out_col['portable_data_hash']))
+                    col_reader = CollectionReader(out_col['uuid'], num_retries=5)
+                    # print('Saving contigs for', sample_id)
+                    # save_contigs(sample_id, col_reader)
+                    # continue
+            
+                    report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
+                    report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
+                    report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
+                    report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
+                    report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
             if sample_state['status'] == 'new':
                 if proc_cnt == 10: # Do not submit more than 10 jobs
                     continue
@@ -215,15 +242,13 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                     it['properties']['analysis_status'] = 'complete'
                     res = api.collections().update(
                         uuid=it['uuid'],
-                        body={"manifest_text": col["manifest_text"] + out_col["manifest_text"],
-                              "properties": it["properties"]}).execute()
-                    update_pangenome = True
+                        body={"properties": it["properties"]}).execute()
+                    # update_pangenome = True
                 elif cr_state == 'Failed':
                     state[sample_id] = {
                         'status': 'new',
                         'container_request': None,
                         'output_collection': None,
-
                     }
             elif sample_state['status'] == 'complete':
                 # TODO: do nothing
@@ -247,7 +272,7 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
                     body={"manifest_text": out_col["manifest_text"]}).execute()
                 state['last_pangenome_request_status'] = 'complete'
 
-        col_reader = CollectionReader(pangenome_result_col_uuid)
+        col_reader = CollectionReader(pangenome_result_col_uuid, num_retries=5)
         report_data["iqtree"] = get_iqtree_result(col_reader)
         report_data["roary_svg"] = get_roary_svg(col_reader)
         report_data["roary_stats"] = get_roary_stats(col_reader)
@@ -257,10 +282,20 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid, pangenome_w
         report_data["core"] = get_core_genome(col_reader)
         generate_report(report_data)
     except Exception as e:
-        print(e)
+        print(sample_state)
+        traceback.print_exc()
 
     with open('state.json', 'w') as f:
         f.write(json.dumps(state))
+
+
+def save_contigs(sample_id, col):
+    with col.open('skesa_contigs.fa', 'rb') as f:
+        with open(f'data/contigs/{sample_id}.fa', "wb") as w:
+            content = f.read(128*1024)
+            while content:
+                w.write(content)
+                content = f.read(128*1024)
 
 def get_core_genome(col):
     result = []
