@@ -16,7 +16,7 @@ PREFIX geonames: <https://www.geonames.org/>
   MainSchema:submitter @:submitterShape ;
   MainSchema:technology @:technologyShape ;
   MainSchema:bacteria @:bacteriaShape;
-  MainSchema:phenotypes @:phenotypesShape;
+  MainSchema:phenotypes @:phenotypesShape?;
 }
 
 :hostShape {
@@ -77,5 +77,5 @@ PREFIX geonames: <https://www.geonames.org/>
 }
 
 :phenotypesShape {
-    phenoSchema:susceptibility @:susceptibilityShape+; 
+    phenoSchema:susceptibility @:susceptibilityShape*; 
 }

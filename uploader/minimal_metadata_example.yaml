@@ -16,3 +16,6 @@ technology:
 
 submitter:
     authors: [John Doe]
+
+phenotypes:
+    susceptibility: []
