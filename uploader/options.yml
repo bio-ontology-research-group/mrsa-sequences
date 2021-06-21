@@ -13,16 +13,17 @@ host_age_unit:
 host_sex:
   Male: http://purl.obolibrary.org/obo/PATO_0000384
   Female: http://purl.obolibrary.org/obo/PATO_0000383
-  Intersex: http://purl.obolibrary.org/obo/PATO_0001340
 
 host_health_status:
   healthy: http://purl.obolibrary.org/obo/NCIT_C115935
   asymptomatic: http://purl.obolibrary.org/obo/NCIT_C3833
   symptomatic: http://purl.obolibrary.org/obo/NCIT_C25269
+  hospitalized: http://purl.obolibrary.org/obo/NCIT_C25179
   admitted to hospital: http://purl.obolibrary.org/obo/GENEPIO_0002020
   discharged from hospital: http://purl.obolibrary.org/obo/GENEPIO_0001849
   dead: http://purl.obolibrary.org/obo/NCIT_C28554
   alive: http://purl.obolibrary.org/obo/NCIT_C37987
+
 
 sample_sequencing_technology:
   Illumina NextSeq 500: http://www.ebi.ac.uk/efo/EFO_0009173
@@ -34,13 +35,32 @@ sample_sequencing_technology:
   Oxford Nanopore MinION: http://www.ebi.ac.uk/efo/EFO_0008632
   Oxford Nanopore Sequencing: http://purl.obolibrary.org/obo/NCIT_C146818
   Sanger dideoxy sequencing: http://purl.obolibrary.org/obo/NCIT_C19641
-
+  
 specimen_source:
   nasopharyngeal swab: http://purl.obolibrary.org/obo/NCIT_C155831
+  nasal swab: http://purl.obolibrary.org/obo/NCIT_C132119
   oropharyngeal swab: http://purl.obolibrary.org/obo/NCIT_C155835
   sputum: http://purl.obolibrary.org/obo/NCIT_C13278
   bronchoalveolar lavage fluid: http://purl.obolibrary.org/obo/NCIT_C13195
-
+  wound: http://purl.obolibrary.org/obo/NCIT_C3671
+  tissue sample: http://purl.obolibrary.org/obo/NCIT_C19697
+  blood sample: http://purl.obolibrary.org/obo/NCIT_C17610
+  umbilical: http://purl.obolibrary.org/obo/NCIT_C133318
+  pus: http://purl.obolibrary.org/obo/NCIT_C50718
+  high vaginal swab: http://purl.obolibrary.org/obo/NCIT_C12407
+  bed swab: http://purl.obolibrary.org/obo/NCIT_C50367
+  eye swab: http://purl.obolibrary.org/obo/NCIT_C12401
+  tracheal: http://purl.obolibrary.org/obo/NCIT_C12428
+  urine: http://purl.obolibrary.org/obo/NCIT_C13283
+  respiratory: http://purl.obolibrary.org/obo/NCIT_C25656
+  ear swab: http://purl.obolibrary.org/obo/NCIT_C12394
+  groin: http://purl.obolibrary.org/obo/NCIT_C12726
+  genital: http://purl.obolibrary.org/obo/NCIT_C13348
+  aspiration: http://purl.obolibrary.org/obo/NCIT_C15631
+  other: http://purl.obolibrary.org/obo/NCIT_C17649
+  
+  
+  
 antimicrobial_agent:
   Benzylpenicillin: http://purl.obolibrary.org/obo/CHEBI_18208
   Cefoxitin: http://purl.obolibrary.org/obo/CHEBI_209807
@@ -67,3 +87,13 @@ interpretation:
   S: http://purl.obolibrary.org/obo/PATO_0000516
   R: http://purl.obolibrary.org/obo/PATO_0001178
   I: http://purl.obolibrary.org/obo/PATO_0001153
+
+
+sample_collection_location:
+  Saudi Arabia: https://www.geonames.org/102358/kingdom-of-saudi-arabia.html
+  Riyadh: https://www.geonames.org/108410/riyadh.html
+  Madina: https://www.geonames.org/109223/medina.html
+  Jeddah: https://www.geonames.org/105343/jeddah.html
+  Hail: https://www.geonames.org/106281/ha-il.html
+  Eastern province: https://www.geonames.org/108241/eastern-province.html
+  Makkah: https://www.geonames.org/104515/mecca.html  

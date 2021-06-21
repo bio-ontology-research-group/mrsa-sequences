@@ -16,15 +16,3 @@ technology:
 
 submitter:
     authors: [John Doe]
-
-phenotypes:
-    susceptibility:
-        - antimicrobial_agent: http://purl.obolibrary.org/obo/CHEBI_18208
-          mic: ">= 0.5"
-          interpretation: http://purl.obolibrary.org/obo/PATO_0001178
-        - antimicrobial_agent: http://purl.obolibrary.org/obo/CHEBI_7809
-          mic: ">= 4"
-          interpretation: http://purl.obolibrary.org/obo/PATO_0001178
-        - antimicrobial_agent: http://purl.obolibrary.org/obo/CHEBI_17833
-          mic: "<= 0.5"
-          interpretation: http://purl.obolibrary.org/obo/PATO_0000516

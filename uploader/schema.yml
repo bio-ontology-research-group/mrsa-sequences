@@ -83,6 +83,11 @@ $graph:
       type: string?
       jsonldPredicate:
           _id: http://www.ebi.ac.uk/efo/EFO_0000727
+    host_hospital:
+      doc: An institution that provides medical, surgical, or psychiatric care and treatment for the sick or the injured.
+      type: string?
+      jsonldPredicate:
+          _id: http://purl.obolibrary.org/obo/NCIT_C16696
     host_vaccination:
       doc: List of vaccines given to the host
       type: string[]?
@@ -115,7 +120,7 @@ $graph:
       jsonldPredicate:
         _id: http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25164
     collection_location:
-      doc: Geographical location where the sample was collected as wikidata reference, e.g. http://www.wikidata.org/entity/Q148 (China)
+      doc: Geographical location where the sample was collected as wikidata reference, e.g. http://www.wikidata.org/entity/Q148 (China), https://www.geonames.org/108410/riyadh.html
       type: string
       jsonldPredicate:
         _id: http://purl.obolibrary.org/obo/GAZ_00000448
@@ -261,7 +266,7 @@ $graph:
     bacteria: bacteriaSchema
     technology: technologySchema
     submitter: submitterSchema
-    phenotypes: phenoSchema
+    phenotypes: phenoSchema?
     id:
       doc: The subject (eg the fasta/fastq file) that the metadata describes
       type: string
