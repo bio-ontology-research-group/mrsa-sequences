@@ -16,6 +16,7 @@ import tempfile
 import logging
 import traceback
 import pandas as pd
+from itertools import zip_longest
 
 sys.path.insert(0, '')
 
@@ -65,8 +66,12 @@ def main(fastq_project):
         'MRSA095', 'MRSA096', 'MRSA097', 'MRSA098', 'MRSA099', 'MRSA100',
         'MRSA101', 'MRSA102', 'MRSA117', 'MRSA118', 'MRSA124', 'MRSA133',
         'MRSA187', 'MRSA261', 'MRSA314', 'MRSA355', 'MRSA357', 'MRSA360',
-        'MRSA361', 'MRSA390', 'MRSA420', 'MRSA422', 'MRSA477'
+        'MRSA361', 'MRSA390', 'MRSA420', 'MRSA422', 'MRSA477', 'MRSA051',
+        'MRSA052', 'MRSA053', 'MRSA054', 'MRSA055', 'MRSA056'
     ])
+    # Environmental samples
+    for i in range(464, 523):
+        bad_samples.add(f'MRSA{i}')
 
     drug_names = {}
     with open('data/drugs.yml') as f:
@@ -81,15 +86,19 @@ def main(fastq_project):
         for key, value in drugs_list.items():
             drug_names[value] = key
             drugs[key] = value
+        loc_names = {}
+        for key, value in options['sample_collection_location'].items():
+            loc_names[value] = key
         
     try:
         all_drugs = set()
         fp = 0
         tp = 0
-        genotype = {'samples': []}
+        genotype = {'samples': [], 'location':[]}
         labs_resist = []
         labs_sensitive = []
         samples = []
+        locations = []
         
         for it in reads[1:]:
             col = api.collections().get(uuid=it['uuid']).execute()
@@ -102,38 +111,46 @@ def main(fastq_project):
             if sample_state['status'] == 'complete':
                 out_col = api.collections().get(
                     uuid=sample_state['output_collection']).execute()
-                if sample_id not in bad_samples:
-                    col_reader = CollectionReader(out_col['uuid'])
-                    res_drugs = get_resistome_report(col_reader)
-                    header = res_drugs[0]
-                    for item in header:
-                        if item not in genotype:
-                            genotype[item] = []
-                    for item in res_drugs[1:]:
-                        genotype['samples'].append(sample_id)
-                        for col, value in zip(header, item):
-                            genotype[col].append(value)
-                    
-                    # drug_ids = set([drug_names[drugs[x]] for x in res_drugs])
-                    with open(f'/opt/data-mrsa/metadata/{sample_id}.yaml') as f:
-                        metadata = yaml.load(f, Loader=yaml.FullLoader)
-                        if not 'susceptibility' in metadata['phenotypes']:
-                            continue
-                        sus = metadata['phenotypes']['susceptibility']
-                        meta_drugs = []
-                        sens_drugs = []
-                        for item in sus:
-                            if item['interpretation'] == 'http://purl.obolibrary.org/obo/PATO_0001178':
-                                meta_drugs.append((drug_names[item['antimicrobial_agent']], item['mic']))
-                            else:
-                                sens_drugs.append((drug_names[item['antimicrobial_agent']], item['mic']))
-                    samples.append(sample_id)
-                    labs_resist.append(meta_drugs)
-                    labs_sensitive.append(sens_drugs)
+                if sample_id in bad_samples:
+                    continue
+                file_id = 'ID00' + sample_id[-3:]
+                with open(f'data/metadata/{file_id}.yaml') as f:
+                    metadata = yaml.load(f, Loader=yaml.FullLoader)
+                location_id = metadata['sample']['collection_location']
+                location = loc_names[location_id]
+                col_reader = CollectionReader(out_col['uuid'])
+                res_drugs = get_resistome_report(col_reader)
+                header = res_drugs[0]
+                for item in header:
+                    if item not in genotype:
+                        genotype[item] = []
+                for item in res_drugs[1:]:
+                    genotype['samples'].append(sample_id)
+                    genotype['location'].append(location)
+                    for col, value in zip_longest(header, item):
+                        genotype[col].append(value)
+
+                # drug_ids = set([drug_names[drugs[x]] for x in res_drugs])
+                    if not 'susceptibility' in metadata['phenotypes']:
+                        continue
+                    sus = metadata['phenotypes']['susceptibility']
+                    meta_drugs = []
+                    sens_drugs = []
+                    for item in sus:
+                        if item['interpretation'] == 'http://purl.obolibrary.org/obo/PATO_0001178':
+                            meta_drugs.append((drug_names[item['antimicrobial_agent']], item['mic']))
+                        else:
+                            sens_drugs.append((drug_names[item['antimicrobial_agent']], item['mic']))
+                samples.append(sample_id)
+                labs_resist.append(meta_drugs)
+                labs_sensitive.append(sens_drugs)
+                locations.append(location)
         df = pd.DataFrame({'samples': samples, 'resistance': labs_resist,
-                           'sensitive': labs_sensitive})
+                           'sensitive': labs_sensitive, 'location': locations})
         df.to_pickle('data/lab_resistance.pkl')
+        df.to_csv('data/lab_resistance.csv')
         df = pd.DataFrame(genotype)
+        df.to_csv('data/gt_resistance.csv')
         df.to_pickle('data/gt_resistance.pkl')
         
         # print(all_drugs)

@@ -182,6 +182,10 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
         'MRSA481', 'MRSA490', 'MRSA491', 'MRSA500', 'MRSA501', 'MRSA502', 'MRSA503',
         'MRSA088', 'MRSA112', 'MRSA260',
     ])
+    # Environmental samples
+    for i in range(464, 523):
+        bad_samples.add(f'MRSA{i}')
+
     try:
         for it in reads[1:]:
             col = api.collections().get(uuid=it['uuid']).execute()
