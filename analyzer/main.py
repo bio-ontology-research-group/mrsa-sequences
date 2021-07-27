@@ -40,6 +40,7 @@ def run_workflow(api, parent_project, workflow_uuid, name, inputobj):
         tmp.write(json.dumps(inputobj, indent=2).encode('utf-8'))
         tmp.flush()
         cmd = ["arvados-cwl-runner",
+               "--debug",
                "--submit",
                "--no-wait",
                "--project-uuid=%s" % project["uuid"],
@@ -80,7 +81,7 @@ def submit_new_request(
         },
         "snippy_ref": {
             "class": "File",
-            "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.fasta"
+            "location": "keep:963fa93ead9e477fddfe707a59a4f329+204/reference.fasta"
         },
         "sample_id": sample_id
     }
@@ -111,14 +112,19 @@ def submit_new_request(
 def submit_pangenome(
         api, workflows_project, pangenome_workflow_uuid, data):
     inputobj = {
-        "gff_files": [],
+        "gff_files": [
+            {
+                "class": "File",
+                "location": "keep:963fa93ead9e477fddfe707a59a4f329+204/Reference.gff"
+            },
+        ],
         "reference": {
             "class": "File",
-            "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.fasta"
+            "location": "keep:963fa93ead9e477fddfe707a59a4f329+204/reference.fasta"
         },
         "reference_gb": {
             "class": "File",
-            "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.gb"
+            "location": "keep:963fa93ead9e477fddfe707a59a4f329+204/reference.gb"
         },
         "metadata": {
             "class": "File",
@@ -127,9 +133,10 @@ def submit_pangenome(
         "dirs": [],
     }
     for s_id, pdh in data:
+        s_id = s_id.replace('ID00', 'MRSA')
         inputobj["gff_files"].append({
             "class": "File",
-            "location": f'keep:{pdh}/{s_id}.gff'})
+            "location": f'keep:{pdh}/prokka/{s_id}.gff'})
         inputobj["dirs"].append({
             "class": "Directory",
             "location": f'keep:{pdh}/{s_id}'})
@@ -180,11 +187,16 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
         'MRSA028', 'MRSA070', 'MRSA116', 'MRSA179', 'MRSA243', 'MRSA270',
         'MRSA372', 'MRSA384', 'MRSA413', 'MRSA442', 'MRSA478', 'MRSA480',
         'MRSA481', 'MRSA490', 'MRSA491', 'MRSA500', 'MRSA501', 'MRSA502', 'MRSA503',
-        'MRSA088', 'MRSA112', 'MRSA260',
+        'MRSA088', 'MRSA112', 'MRSA260', 'ID00277', 'ID00274', 'ID00253', 'ID00244',
+        'ID00243', 'ID00224', 'ID00208', 
     ])
     # Environmental samples
     for i in range(464, 523):
         bad_samples.add(f'MRSA{i}')
+
+    # Snippy core problem
+    for i in range(241, 282):
+        bad_samples.add(f'ID00{i}')
 
     try:
         for it in reads[1:]:
@@ -203,21 +215,21 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
             if sample_state['status'] == 'complete':
                 out_col = api.collections().get(
                     uuid=sample_state['output_collection']).execute()
+                col_reader = CollectionReader(out_col['uuid'], num_retries=5)
+                report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
+                report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
+                report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
+                report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
+                report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
                 if sample_id not in bad_samples:
 
                     pangenome_data.append((sample_id, out_col['portable_data_hash']))
-                    col_reader = CollectionReader(out_col['uuid'], num_retries=5)
-                    # print('Saving contigs for', sample_id)
-                    # save_contigs(sample_id, col_reader)
+                    #print('Saving contigs for', sample_id)
+                    #save_contigs(sample_id, col_reader)
                     # continue
             
-                    report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
-                    report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
-                    report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
-                    report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
-                    report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
             if sample_state['status'] == 'new':
-                if proc_cnt == 10: # Do not submit more than 10 jobs
+                if proc_cnt == 1: # Do not submit more than 10 jobs
                     continue
                 container_request, status = submit_new_request(
                     api, workflows_project, metagenome_workflow_uuid, sample_id,
@@ -284,7 +296,13 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
         report_data["snp_dists"] = snp_dists
         report_data["snp_hist"] = {'nums': json.dumps(hist_data), 'start': 0, 'end': max(hist_data)}
         report_data["core"] = get_core_genome(col_reader)
-        generate_report(report_data)
+        
+        del report_data["roary_svg"]
+        del report_data["snp_dists"]
+        with open('data/analysis.json', 'w') as f:
+            f.write(json.dumps(report_data))
+        #generate_report(report_data)
+        
     except Exception as e:
         print(sample_state)
         traceback.print_exc()
@@ -294,6 +312,7 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
 
 
 def save_contigs(sample_id, col):
+    sample_id = sample_id.replace('ID00', 'MRSA')
     with col.open('skesa_contigs.fa', 'rb') as f:
         with open(f'data/contigs/{sample_id}.fa', "wb") as w:
             content = f.read(128*1024)
@@ -368,7 +387,7 @@ def get_resistome_report(col):
             it = line.strip().split('\t')
             result |= set(it[-1].split(';'))
     # print()
-    return result
+    return list(result)
 
 def get_virulome_report(col):
     result = []
@@ -380,18 +399,23 @@ def get_virulome_report(col):
     return result
 
 def get_prokka_report(col, sample_id):
-    result = {}
+    sample_id = sample_id.replace('ID00', 'MRSA')
+    result = {'organism': '', 'contigs': '0', 'bases': '0', 'CDS': '0', 'rRNA': '0', 'tRNA': '0', 'tmRNA':'0'}
     filename = 'prokka/prokka.txt'
     try:
         f = col.open(filename, 'r')
         f.close()
     except Exception as e:
         filename = f'prokka/{sample_id}.txt'
-    with col.open(filename, "r") as f:
-        next(f)
-        for line in f:
-            it = line.strip().split(': ')
-            result[it[0]] = it[1]
+    try:
+        with col.open(filename, "r") as f:
+            next(f)
+            for line in f:
+                it = line.strip().split(': ')
+                result[it[0]] = it[1]
+    except Exception as e:
+        print(e)
+    
     return result
 
 
