@@ -27,6 +27,9 @@ outputs:
   pangenome:
     type: File
     outputSource: roary/pangenome
+  gene_presence_absence:
+    type: File
+    outputSource: roary/gene_presence_absence
   pangenome_stats:
     type: File
     outputSource: roary/statistics

@@ -195,6 +195,10 @@ outputs:
     type: File
     outputBinding:
       glob: $(inputs.outdir)/$(inputs.prefix).tab
+  txt_output:
+    type: File
+    outputBinding:
+      glob: $(inputs.outdir)/$(inputs.prefix).txt
   csv_output:
     label: A comma-separated version of the .tab file .html
     type: File

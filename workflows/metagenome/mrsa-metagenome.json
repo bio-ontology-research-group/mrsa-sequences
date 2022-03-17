@@ -1,19 +1,19 @@
 {
     "kraken_db": {
         "class": "Directory",
-        "path": "/opt/data-mrsa/dbs/minikraken"
+        "path": "/home/kulmanm/data/dbs/minikraken"
     },
     "snippy_ref": {
         "class": "File",
-        "path": "/opt/data-mrsa/dbs/NC_007795.1.fasta"
+        "path": "/home/kulmanm/data/dbs/NC_007795.1.fasta"
     },
-    "sample_id": "MRSA094",
+    "sample_id": "MRSA001",
     "fastq1":{
         "class": "File",
-        "path": "/opt/data-mrsa/reads/MRSA094_R1.fastq.gz"
+        "path": "/home/kulmanm/data/mrsa/MRSA001_R1.fastq.gz"
     },
     "fastq2": {
         "class": "File",
-        "path": "/opt/data-mrsa/reads/MRSA094_R2.fastq.gz"
+        "path": "/home/kulmanm/data/mrsa/MRSA001_R2.fastq.gz"
     }
 }

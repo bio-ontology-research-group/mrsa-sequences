@@ -29,12 +29,12 @@ outputs:
   snippyVCF:
     type: File
     outputSource: snippy/vcf_output
-  snippyOutdir:
-    type: Directory
-    outputSource: snippy/out_directory
-  prokkaOutdir:
-    type: Directory
-    outputSource: prokka/out_directory
+  snippyTxt:
+    type: File
+    outputSource: snippy/txt_output
+  snippyAligned:
+    type: File
+    outputSource: snippy/aligned_fasta_output
   prokkaFAA:
     type: File
     outputSource: prokka/faa_output
@@ -92,7 +92,7 @@ steps:
       outdir: sample_id
       force:
         default: true
-    out: [vcf_output, out_directory]
+    out: [vcf_output, aligned_fasta_output, txt_output]
     run: snippy.cwl
   prokka:
     in:
@@ -100,7 +100,7 @@ steps:
       force:
         default: true
       prefix: sample_id
-    out: [faa_output, gff_output, out_directory]
+    out: [faa_output, gff_output]
     run: prokka.cwl
   mlst:
     in:

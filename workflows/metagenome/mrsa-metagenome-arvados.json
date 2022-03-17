@@ -5,15 +5,15 @@
     },
     "snippy_ref": {
         "class": "File",
-        "location": "keep:93b026cb22456ff8bc55a47b736d439a+69/reference.fasta"
+        "location": "keep:1630555a9f4d1d70d5bc19ac5f1d6800+133/reference.fasta"
     },
-    "sample_id": "MRSA002",
+    "sample_id": "ID00261",
     "fastq1":{
         "class": "File",
-        "location": "keep:c0ffbaea40130a41e9ebfcd2b488e7df+372/reads1.fastq.gz",
+        "location": "keep:e47bf60b769591555dcc1d13c8c0a614+1979/reads1.fastq.gz",
     },
     "fastq2": {
         "class": "File",
-        "location": "keep:c0ffbaea40130a41e9ebfcd2b488e7df+372/reads2.fastq.gz",
+        "location": "keep:e47bf60b769591555dcc1d13c8c0a614+1979/reads2.fastq.gz",
     }
 }
