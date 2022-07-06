@@ -14,7 +14,7 @@ git clone https://github.com/bio-ontology-research-group/mrsa-sequences.git
 
 ```sh
 sudo apt update
-sudo apt install -y virtualenv git libcurl4-openssl-dev build-essential python3-dev libssl-dev
+sudo apt install -y virtualenv git libcurl4-openssl-dev build-essential python3-dev libssl-dev libxml2 libxslt1-dev
 ```
 3. **Create and enter your virtualenv.** Go to downloaded uploader directory and make and enter a virtualenv:
 
