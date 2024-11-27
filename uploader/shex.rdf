@@ -73,7 +73,7 @@ PREFIX geonames: <https://www.geonames.org/>
 :susceptibilityShape {
     obo:CHEBI_33281 [ obo:CHEBI_~ ] ;
     obo:OBI_0001514 xsd:string ?;
-    obo:PATO_0001995 [ obo:PATO_0001178 obo:PATO_0000516 ] ?;
+    obo:PATO_0001995 [ obo:PATO_0001178 obo:PATO_0000516 obo:PATO_0001153 ] ?;
 }
 
 :phenotypesShape {

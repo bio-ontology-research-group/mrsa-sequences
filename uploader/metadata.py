@@ -4,10 +4,12 @@ import json
 import yaml
 import csv
 import os
+import pandas as pd
 
 @ck.command()
 @ck.option('--tsv-file', '-tf', required=True, help='TSV file with all metadata')
 def main(tsv_file):
+    lab_phenos = load_lab_phenotypes()
     min_metadata = yaml.load(
         open('uploader/minimal_metadata_example.yaml'),
         Loader=yaml.FullLoader)
@@ -18,8 +20,11 @@ def main(tsv_file):
                 continue
             it = line.split('\t')
             sample = it[0]
-            sample_id = sample.replace('MRSA', 'ID0')
-            phenotypes = load_phenotypes(sample_id)
+            sample_id = sample
+            if sample_id in lab_phenos:
+                phenotypes = lab_phenos[sample_id]
+            else:
+                phenotypes = load_phenotypes(sample_id)
             bacteria = 'saureus'
             date = it[5].strip()
             country = format_location(options, 'Saudi Arabia')
@@ -31,7 +36,7 @@ def main(tsv_file):
             specimen_source = it[9].strip()
             hospitalized = it[10].strip()
             metadata = min_metadata.copy()
-            metadata['sample']['sample_id'] = sample
+            metadata['sample']['sample_id'] = sample_id
             metadata['sample']['collection_date'] = date
             metadata['sample']['collection_location'] = country
             if date:
@@ -48,7 +53,7 @@ def main(tsv_file):
             if gender:
                 gender = format_gender(options, gender)
                 metadata['host']['host_sex'] = gender
-            if age:
+            if age and age != 'U':
                 age, unit = format_age(options, age)
                 metadata['host']['host_age'] = age
                 metadata['host']['host_age_unit'] = unit
@@ -60,7 +65,7 @@ def main(tsv_file):
             
             if phenotypes:
                 metadata['phenotypes'] = phenotypes
-            with open(f'data/metadata/{sample}.yaml', 'w') as w:
+            with open(f'data/metadata/{sample_id}.yaml', 'w') as w:
                 yaml.dump(metadata, w)
 
 def format_date(date):
@@ -82,7 +87,9 @@ def format_date(date):
 
 def format_location(options, city):
     ls = options['sample_collection_location']
-    return ls[city]
+    if city in ls:
+        return ls[city]
+    return ''
 
 def format_source(options, source):
     source = source.strip().lower()
@@ -105,12 +112,19 @@ def format_gender(options, gender):
 def format_age(options, age):
     units = options['host_age_unit']
     if age.find(' ') == -1:
-        age = age[:-1] + ' ' + age[-1]
+        if not age.isdigit():
+            i = -1
+            while not age[:i].isdigit():
+                i -= 1
+            age = age[:i] + ' ' + age[i:]
+        else:
+            age += ' y'
+    print(age)
     val, unit = age.split()
     unit = unit.lower()
-    if unit == 'y' or unit == 'year':
+    if unit == 'y' or unit == 'year' or unit == 'years':
         unit = 'Years'
-    elif unit == 'm' or unit == 'month':
+    elif unit == 'm' or unit == 'month' or unit == 'mo' or unit == 'months':
         unit = 'Months'
     elif unit == 'd' or unit == 'day':
         unit = 'Days'
@@ -125,9 +139,9 @@ def format_hospitalized(options, hospitalized):
     return status[hospitalized]
 
 def load_phenotypes(sample_id):
-    sample_id = sample_id[:2] + sample_id[3:]
+    fid = 'ID0' + sample_id[-3:]
     phenotypes = []
-    filename = f'data/vitek_csvs/{sample_id}-1.csv'
+    filename = f'data/vitek_csvs/{fid}-1.csv'
     if not os.path.exists(filename):
         print(sample_id, 'None')
         return None
@@ -182,6 +196,58 @@ def load_phenotypes(sample_id):
             })
         
     return {'susceptibility': sus}
-  
+
+def load_lab_phenotypes():
+    mapping = {}
+    id_df = pd.read_csv('data/pheno_id_map.csv', sep='\t')
+    for i, row in id_df.iterrows():
+        mapping[row['Samle name']] = row['UID']
+    with open('uploader/options.yml') as f:
+        options = yaml.load(f, Loader=yaml.FullLoader)
+
+    drugs = options['antimicrobial_agent']
+    inter = options['interpretation']
+
+    result = {}
+    with open('data/phenotypes.tsv') as f:
+        data = f.read().split('\t\t\t\t\t')
+
+        for item in data:
+            lines = item.splitlines()
+            if len(lines) <= 1:
+                continue
+            i = 0
+            if lines[0] == '':
+                i += 1
+            lab_id = int(lines[i].split('\t')[1])
+            if lab_id not in mapping:
+                continue
+            sample_id = mapping[lab_id]
+            sample_id = 'ID00' + sample_id[4:]
+            sus = []
+            for line in lines[i + 2:]:
+                it = line.split('\t')
+                if len(it) != 6:
+                    continue
+                items = it[:3], it[3:]
+                for d, mic, ip in items:
+                    d, mic, ip = d.strip(), mic.strip(), ip.strip(' *')
+                    if d == 'Cefoxitin Screen':
+                        ip = 'R' if mic == 'POS' else 'S'
+                        d = 'Cefoxitin'
+                    elif d == 'Inducible Clindamycin Resistance':
+                        ip = 'R' if mic == 'POS' else 'S'
+                        d = 'Clindamycin'
+                   
+                    if d in drugs and ip in inter:
+                        sus.append({
+                            'antimicrobial_agent': drugs[d],
+                            'mic': mic,
+                            'interpretation': inter[ip]
+                        })
+            result[sample_id] = {'susceptibility': sus}
+    print(result.keys())
+    return result
+    
 if __name__ == '__main__':
     main()

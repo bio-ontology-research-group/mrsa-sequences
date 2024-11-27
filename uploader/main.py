@@ -74,7 +74,7 @@ def validate_metadata(metadata_file):
 
 @ck.command()
 @ck.option(
-    '--uploader-project', default='cborg-j7d0g-y651nepk74ziw3p',
+    '--uploader-project', default='cborg-j7d0g-1reggns1q6sti0i',
     help='MRSA FASTQ sequences project uuid')
 @ck.option('--sequence-read1', '-sr1', help='Gzipped FASTQ File (*.fastq.gz) read 1')
 @ck.option('--sequence-read2', '-sr2', help='Gzipped FASTQ File (*.fastq.gz) read 2')

@@ -1,55 +1,83 @@
 import pandas as pd
 import numpy as np
 import click as ck
-from matplotlib import pyplot as plt
 from collections import Counter
+from analyzer.constants import bad_samples
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 ck.command()
 def main():
-    plt.rcdefaults()
-    fig, ax = plt.subplots()
-    
-    # drugs
-    
-    df = pd.read_pickle('data/resistance.pkl')
-    df = load_card(df)
-    res_drugs = df['card_drugs']
-    # res_drugs = []
-    # fpn = 0
-    # tpn = 0
-    # fnn = 0
-    # for row in df.itertuples():
-    #     tp = set(row.genotype).intersection(row.labs_resist)
-    #     fp = set(row.genotype).intersection(row.labs_sensitive)
-    #     fn = set(row.labs_resist) - set(row.genotype)
-    #     tpn += len(tp)
-    #     fpn += len(fp)
-    #     fnn += len(fn)
-    #     res_drugs.append(fn)
-    
-    drugs = Counter()
-    for ds in res_drugs:
-        drugs.update(ds)
+    plot_sequence_types()
 
-    drugs = dict(drugs.most_common())
-    drug_names = list(drugs.keys())
-    for i in range(len(drug_names)):
-        if drug_names[i] == 'Trimethoprim/Sulfamethoxazole':
-            drug_names[i] = 'Trimethoprim'
-        elif drug_names[i].find('+') != -1:
-            drug_names[i] = drug_names[i].split('+')[0]
-    y_pos = np.arange(len(drugs))
-    samples = drugs.values()
+def plot_sequence_types():
+    df = pd.read_csv('data/cleanmrsa.csv', sep=',')
+    df['val'] = [1] * len(df)
+    df = df[df['species'] == 'Staphylococcus aureus']
+    print(len(df))
+
+    # locations = df['geolocation']
+    # seq_types = df['ST']
+    data = {}
+    all_types = set()
+    for row in df.itertuples():
+        if row.geolocation not in data:
+            data[row.geolocation] = Counter()
+        data[row.geolocation][str(row.ST)] += 1
+        all_types.add(str(row.ST))
+    all_types = sorted(list(all_types))
+    locations = []
+    seq_types = []
+    number = []
+    for loc, stypes in data.items():
+        for st in all_types:
+            locations.append(loc)
+            seq_types.append(st)
+            number.append(stypes[st])
+
+    data_df = pd.DataFrame({'Location': locations, 'Sequence Type': seq_types, 'Number': number})
+    sns.set_theme()
+    # Load the example flights dataset and convert to long-form
+    seq_types = data_df.pivot("Location", "Sequence Type", "Number")
+    # Draw a heatmap with the numeric values in each cell
+    f, ax = plt.subplots(figsize=(9, 6))
+    sns.heatmap(seq_types, annot=True, fmt="d", linewidths=.5, ax=ax)
+    plt.savefig('/home/kulmanm/data/seq_types.png')
     
-    ax.barh(y_pos, samples, align='center')
-    ax.set_yticks(y_pos)
-    ax.set_yticklabels(drug_names)
-    ax.invert_yaxis()  # labels read top-to-bottom
-    ax.set_xlabel('Number of samples')
-    # ax.set_title(f'False negatives. Positive in lab, not in genotype ({fnn})')
-    ax.set_title(f'CARD database drugs')
-    plt.tight_layout()
-    plt.savefig('/opt/data/card.png')
+    
+def plot_resistance():
+    plt.rcdefaults()
+    
+    df = pd.read_pickle('data/lab_resistance.pkl')
+
+    drugs = {}
+    total = Counter()
+    for row in df.itertuples():
+        if row.samples in bad_samples:
+            print(row.samples)
+            continue
+        for d, m in row.resistance:
+            if row.location not in drugs:
+                drugs[row.location] = Counter()
+            drugs[row.location][d] += 1
+            total[d] += 1
+    print(len(df))
+    all_drugs = list(total.keys())
+    for d, cnt in drugs.items():
+        locations = dict(cnt.most_common())
+        y_pos = np.arange(len(all_drugs))
+        samples = [locations[d] if d in locations else 0 for d in all_drugs]
+        fig, ax = plt.subplots()
+        ax.barh(y_pos, samples, align='center')
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(all_drugs)
+        #ax.invert_yaxis()  # labels read top-to-bottom
+        ax.set_xlabel('Number of samples')
+        # ax.set_title(f'False negatives. Positive in lab, not in genotype ({fnn})')
+        ax.set_title(f'Resistance by drugs for {d}')
+        plt.tight_layout()
+        d = d.replace('/', '_')
+        plt.savefig(f'/home/kulmanm/data/{d}.png')
 
 
 def load_card(df):

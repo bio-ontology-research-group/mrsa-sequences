@@ -103,9 +103,11 @@ def submit_new_request(
     else:
         output = proc.stderr.decode('utf-8')
         lines = output.splitlines()
-        if lines[-2].find('container_request') != -1:
-            container_request = lines[-2].split()[-1]
-            status = 'submitted'
+        for line in lines:
+            if line.find('container_request') != -1:
+                container_request = line.split()[-1]
+                status = 'submitted'
+                break
     return container_request, status
 
 
@@ -136,7 +138,7 @@ def submit_pangenome(
         s_id = s_id.replace('ID00', 'MRSA')
         inputobj["gff_files"].append({
             "class": "File",
-            "location": f'keep:{pdh}/prokka/{s_id}.gff'})
+            "location": f'keep:{pdh}/{s_id}.gff'})
         inputobj["dirs"].append({
             "class": "Directory",
             "location": f'keep:{pdh}/{s_id}'})
@@ -151,15 +153,16 @@ def submit_pangenome(
     else:
         output = proc.stderr.decode('utf-8')
         lines = output.splitlines()
-        if lines[-2].find('container_request') != -1:
-            container_request = lines[-2].split()[-1]
-            status = 'submitted'
+        for line in lines:
+            if line.find('container_request') != -1:
+                container_request = line.split()[-1]
+                status = 'submitted'
+                break
     return container_request, status
 
 
-    
 @ck.command()
-@ck.option('--fastq-project', '-fp', default='cborg-j7d0g-y651nepk74ziw3p', help='MRSA FASTQ sequences project uuid')
+@ck.option('--fastq-project', '-fp', default='cborg-j7d0g-1reggns1q6sti0i', help='MRSA FASTQ sequences project uuid')
 @ck.option('--workflows-project', '-wp', default='cborg-j7d0g-lcux1tdrdshvul7', help='MRSA workflows project uuid')
 @ck.option('--metagenome-workflow-uuid', '-mwid', default='cborg-7fd4e-3ig4fl4bz90uydt', help='Metagenome workflow uuid')
 @ck.option('--pangenome-workflow-uuid', '-pwid', default='cborg-7fd4e-qhxoc5ddgrti3tq', help='Pangenome workflow uuid')
@@ -180,24 +183,50 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
     update_pangenome = False
     proc_cnt = 0
     bad_samples = set([
-        'MRSA095', 'MRSA096', 'MRSA097', 'MRSA098', 'MRSA099', 'MRSA100',
-        'MRSA101', 'MRSA102', 'MRSA117', 'MRSA118', 'MRSA124', 'MRSA133',
-        'MRSA187', 'MRSA261', 'MRSA314', 'MRSA355', 'MRSA357', 'MRSA360',
-        'MRSA361', 'MRSA390', 'MRSA420', 'MRSA422', 'MRSA477',
-        'MRSA028', 'MRSA070', 'MRSA116', 'MRSA179', 'MRSA243', 'MRSA270',
-        'MRSA372', 'MRSA384', 'MRSA413', 'MRSA442', 'MRSA478', 'MRSA480',
-        'MRSA481', 'MRSA490', 'MRSA491', 'MRSA500', 'MRSA501', 'MRSA502', 'MRSA503',
-        'MRSA088', 'MRSA112', 'MRSA260', 'ID00277', 'ID00274', 'ID00253', 'ID00244',
-        'ID00243', 'ID00224', 'ID00208', 
+        'ID00028', 'ID00070', 'ID00095', 'ID00096', 'ID00097',
+        'ID00098', 'ID00101', 'ID00102', 'ID00116', 'ID00124',
+        'ID00133', 'ID00179', 'ID00187', 'ID00212', 'ID00213',
+        'ID00222', 'ID00243', 'ID00260', 'ID00261', 'ID00270',
+        'ID00323', 'ID00349', 'ID00355', 'ID00356', 'ID00357',
+        'ID00360', 'ID00361', 'ID00372', 'ID00384', 'ID00390',
+        'ID00413', 'ID00420', 'ID00422', 'ID00423', 'ID00442',
+        'ID00477', 'ID00478', 'ID00480', 'ID00481', 'ID00490',
+        'ID00491', 'ID00499', 'ID00500', 'ID00501', 'ID00502',
+        'ID00503', 'ID00514', 'ID00515', 'ID00517', 'ID00518',
+        'ID00563', 'ID00568', 'ID00569', 'ID00574', 'ID00579',
+        'ID00581', 'ID00582', 'ID00585', 'ID00589', 'ID00590',
+        'ID00592', 'ID00600', 'ID00601', 'ID00602', 'ID00604',
+        'ID00605', 'ID00607', 'ID00608', 'ID00609', 'ID00619',
+        'ID00624', 'ID00629', 'ID00635', 'ID00643', 'ID00645',
+        'ID00660', 'ID00661', 'ID00662', 'ID00667', 'ID00668',
+        'ID00671', 'ID00672', 'ID00673', 'ID00687', 'ID00692',
+        'ID00693', 'ID00717', 'ID00730', 'ID00736', 'ID00741',
+        'ID00745', 'ID00747', 'ID00755', 'ID00758', 'ID00760',
+        'ID00763', 'ID00773', 'ID00775', 'ID00776', 'ID00778',
+        'ID00780', 'ID00812', 'ID00813', 'ID00814', 'ID00815',
+        'ID00818', 'ID00820', 'ID00822', 'ID00825', 'ID00826',
+        'ID00827', 'ID00829', 'ID00830', 'ID00837', 'ID00838',
+        'ID00840', 'ID00841', 'ID00842', 'ID00843', 'ID00844',
+        'bad_samples'])
+
+    core_bad_samples = set([
+        'ID00099', 'ID00100', 'ID00117', 'ID00118', 'ID00314',
+        'ID00597', 'ID00088', 'ID00297', 'ID00610', 'ID00740',
+        'ID00788', 'ID00231'
     ])
-    # Environmental samples
-    for i in range(464, 523):
-        bad_samples.add(f'MRSA{i}')
-
-    # Snippy core problem
-    for i in range(241, 282):
-        bad_samples.add(f'ID00{i}')
-
+    bad_samples |= core_bad_samples
+    # # Environmental samples
+    # for i in range(464, 523):
+    #     bad_samples.add(f'MRSA{i}')
+    # # Environmental samples p.hong
+    # for i in range(51, 57):
+    #     bad_samples.add(f'MRSA{i:03d}')
+    # # Environmental samples p.hong
+    # for i in range(560, 845):
+    #     bad_samples.add(f'MRSA{i}')
+    # missing = set()
+    # for i in range(523, 560):
+    #     missing.add('ID00' + str(i))
     try:
         for it in reads[1:]:
             col = api.collections().get(uuid=it['uuid']).execute()
@@ -205,6 +234,9 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
                 continue
 
             sample_id = it['properties']['sequence_label']
+
+            # if sample_id not in missing:
+            #     continue
             if sample_id not in state:
                 state[sample_id] = {
                     'status': 'new',
@@ -216,20 +248,23 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
                 out_col = api.collections().get(
                     uuid=sample_state['output_collection']).execute()
                 col_reader = CollectionReader(out_col['uuid'], num_retries=5)
-                report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
-                report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
-                report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
-                report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
-                report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
+                # report_data['kraken'].append((sample_id, get_kraken_report(col_reader)))
+                # report_data['mlst'].append((sample_id, get_mlst_report(col_reader)))
+                # report_data['resistome'].append((sample_id, get_resistome_report(col_reader)))
+                # report_data['virulome'].append((sample_id, get_virulome_report(col_reader)))
+                # report_data['prokka'].append((sample_id, get_prokka_report(col_reader, sample_id)))
                 if sample_id not in bad_samples:
-
-                    pangenome_data.append((sample_id, out_col['portable_data_hash']))
-                    #print('Saving contigs for', sample_id)
-                    #save_contigs(sample_id, col_reader)
-                    # continue
-            
-            if sample_state['status'] == 'new':
-                if proc_cnt == 1: # Do not submit more than 10 jobs
+                    # pangenome_data.append((sample_id, out_col['portable_data_hash']))
+                    # print('Saving files for', sample_id)
+                    save_files(sample_id, col_reader)
+                    cr = api.container_requests().get(
+                        uuid=sample_state["container_request"]).execute()
+                    # get_snippy_output(cr)
+                    continue
+            elif sample_state['status'] == 'new':
+                if proc_cnt == 10: # Do not submit more than 10 jobs
+                    continue
+                if sample_id in bad_samples:
                     continue
                 container_request, status = submit_new_request(
                     api, workflows_project, metagenome_workflow_uuid, sample_id,
@@ -266,16 +301,13 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
                         'container_request': None,
                         'output_collection': None,
                     }
-            elif sample_state['status'] == 'complete':
-                # TODO: do nothing
-                pass
         if update_pangenome:
             container_request, status = submit_pangenome(api, workflows_project, pangenome_workflow_uuid, pangenome_data)
             if status == 'submitted':
                 state['last_pangenome_request'] = container_request
                 state['last_pangenome_request_status'] = 'submitted'
                 print('Submitted pangenome request', container_request)
-        else:
+        elif "last_pangenome_request" in state:
             cr = api.container_requests().get(
                 uuid=state["last_pangenome_request"]).execute()
             cr_state = get_cr_state(api, cr)
@@ -288,20 +320,20 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
                     body={"manifest_text": out_col["manifest_text"]}).execute()
                 state['last_pangenome_request_status'] = 'complete'
 
-        col_reader = CollectionReader(pangenome_result_col_uuid, num_retries=5)
-        report_data["iqtree"] = get_iqtree_result(col_reader)
-        report_data["roary_svg"] = get_roary_svg(col_reader)
-        report_data["roary_stats"] = get_roary_stats(col_reader)
-        snp_dists, hist_data = get_snp_dists(col_reader)
-        report_data["snp_dists"] = snp_dists
-        report_data["snp_hist"] = {'nums': json.dumps(hist_data), 'start': 0, 'end': max(hist_data)}
-        report_data["core"] = get_core_genome(col_reader)
+        # col_reader = CollectionReader(pangenome_result_col_uuid, num_retries=5)
+        # report_data["iqtree"] = get_iqtree_result(col_reader)
+        # report_data["roary_svg"] = get_roary_svg(col_reader)
+        # report_data["roary_stats"] = get_roary_stats(col_reader)
+        # snp_dists, hist_data = get_snp_dists(col_reader)
+        # report_data["snp_dists"] = snp_dists
+        # report_data["snp_hist"] = {'nums': json.dumps(hist_data), 'start': 0, 'end': max(hist_data)}
+        # report_data["core"] = get_core_genome(col_reader)
         
-        del report_data["roary_svg"]
-        del report_data["snp_dists"]
+        # del report_data["roary_svg"]
+        # del report_data["snp_dists"]
         with open('data/analysis.json', 'w') as f:
             f.write(json.dumps(report_data))
-        #generate_report(report_data)
+        # generate_report(report_data)
         
     except Exception as e:
         print(sample_state)
@@ -310,15 +342,58 @@ def main(fastq_project, workflows_project, metagenome_workflow_uuid,
     with open('state.json', 'w') as f:
         f.write(json.dumps(state))
 
-
-def save_contigs(sample_id, col):
-    sample_id = sample_id.replace('ID00', 'MRSA')
-    with col.open('skesa_contigs.fa', 'rb') as f:
-        with open(f'data/contigs/{sample_id}.fa', "wb") as w:
-            content = f.read(128*1024)
-            while content:
-                w.write(content)
+def save_file(col, src, dst):
+    try:
+        with col.open(src, 'rb') as f:
+            with open(dst, "wb") as w:
                 content = f.read(128*1024)
+                while content:
+                    w.write(content)
+                    content = f.read(128*1024)
+    except Exception as e:
+        print(e)
+        print(col, src)
+
+def save_files(sample_id, col):
+    # Save skesa congigs
+    save_file(col, 'skesa_contigs.fa', f'data/contigs/{sample_id}.fa')
+
+    # Save snippy output
+    snippy_root = f'data/snippy/{sample_id}/'
+    if not os.path.exists(snippy_root):
+        os.makedirs(snippy_root)
+    filename = 'snps.vcf'
+    filename_aligned = 'snps.aligned.fa'
+    filename_txt = 'snps.txt'
+        
+    save_file(col, filename, snippy_root + 'snps.vcf')
+    save_file(col, filename_aligned, snippy_root + 'snps.aligned.fa')
+    save_file(col, filename_txt, snippy_root + 'snps.txt')
+
+    # Save prokka output
+    prokka_root = f'data/prokka/'
+    filename = f'{sample_id}.gff'
+    save_file(col, filename, prokka_root + f'{sample_id}.gff')
+
+    # Save ResFinder
+    resfinder_root = 'data/resfinder/'
+    filename = 'abricate_resfinder.tsv'
+    save_file(col, filename, resfinder_root + f'{sample_id}.tsv')
+
+    # Save MLST
+    mlst_root = 'data/mlst/'
+    filename = 'mlst.tsv'
+    save_file(col, filename, mlst_root + f'{sample_id}.tsv')
+
+    # Save Kraken
+    kraken_root = 'data/kraken/'
+    filename = 'kraken_report.txt'
+    save_file(col, filename, kraken_root + f'{sample_id}.tsv')
+    
+
+
+# def get_snippy_output(container_request):
+    
 
 def get_core_genome(col):
     result = []
@@ -367,6 +442,8 @@ def get_kraken_report(col):
                 result.append((float(it[0]), it[4], it[5].strip()))
                 if len(result) == 4:
                     break
+    while len(result) < 4:
+        result.append((0.0, '-', '-'))
     return result
 
 def get_mlst_report(col):
@@ -399,7 +476,6 @@ def get_virulome_report(col):
     return result
 
 def get_prokka_report(col, sample_id):
-    sample_id = sample_id.replace('ID00', 'MRSA')
     result = {'organism': '', 'contigs': '0', 'bases': '0', 'CDS': '0', 'rRNA': '0', 'tRNA': '0', 'tmRNA':'0'}
     filename = 'prokka/prokka.txt'
     try:

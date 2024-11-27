@@ -59,20 +59,44 @@ def main(fastq_project):
         state = json.loads(open('state.json').read())
     reads = arvados.util.list_all(api.collections().list, filters=[["owner_uuid", "=", fastq_project]])
     pangenome_data = []
-    report_data = {'kraken': [], 'mlst': [], 'resistome': [], 'virulome': [], 'prokka': []}
+    report_data = {'kraken': [], 'mlst': [], 'resistome': []}
     update_pangenome = True
     proc_cnt = 0
     bad_samples = set([
-        'MRSA095', 'MRSA096', 'MRSA097', 'MRSA098', 'MRSA099', 'MRSA100',
-        'MRSA101', 'MRSA102', 'MRSA117', 'MRSA118', 'MRSA124', 'MRSA133',
-        'MRSA187', 'MRSA261', 'MRSA314', 'MRSA355', 'MRSA357', 'MRSA360',
-        'MRSA361', 'MRSA390', 'MRSA420', 'MRSA422', 'MRSA477', 'MRSA051',
-        'MRSA052', 'MRSA053', 'MRSA054', 'MRSA055', 'MRSA056'
-    ])
-    # Environmental samples
-    for i in range(464, 523):
-        bad_samples.add(f'MRSA{i}')
+        'ID00028', 'ID00070', 'ID00095', 'ID00096', 'ID00097',
+        'ID00098', 'ID00101', 'ID00102', 'ID00116', 'ID00124',
+        'ID00133', 'ID00179', 'ID00187', 'ID00212', 'ID00213',
+        'ID00222', 'ID00243', 'ID00260', 'ID00261', 'ID00270',
+        'ID00323', 'ID00349', 'ID00355', 'ID00356', 'ID00357',
+        'ID00360', 'ID00361', 'ID00372', 'ID00384', 'ID00390',
+        'ID00413', 'ID00420', 'ID00422', 'ID00423', 'ID00442',
+        'ID00477', 'ID00478', 'ID00480', 'ID00481', 'ID00490',
+        'ID00491', 'ID00499', 'ID00500', 'ID00501', 'ID00502',
+        'ID00503', 'ID00514', 'ID00515', 'ID00517', 'ID00518',
+        'ID00563', 'ID00568', 'ID00569', 'ID00574', 'ID00579',
+        'ID00581', 'ID00582', 'ID00585', 'ID00589', 'ID00590',
+        'ID00592', 'ID00600', 'ID00601', 'ID00602', 'ID00604',
+        'ID00605', 'ID00607', 'ID00608', 'ID00609', 'ID00619',
+        'ID00624', 'ID00629', 'ID00635', 'ID00643', 'ID00645',
+        'ID00660', 'ID00661', 'ID00662', 'ID00667', 'ID00668',
+        'ID00671', 'ID00672', 'ID00673', 'ID00687', 'ID00692',
+        'ID00693', 'ID00717', 'ID00730', 'ID00736', 'ID00741',
+        'ID00745', 'ID00747', 'ID00755', 'ID00758', 'ID00760',
+        'ID00763', 'ID00773', 'ID00775', 'ID00776', 'ID00778',
+        'ID00780', 'ID00812', 'ID00813', 'ID00814', 'ID00815',
+        'ID00818', 'ID00820', 'ID00822', 'ID00825', 'ID00826',
+        'ID00827', 'ID00829', 'ID00830', 'ID00837', 'ID00838',
+        'ID00840', 'ID00841', 'ID00842', 'ID00843', 'ID00844',])
 
+    core_bad_samples = set([
+        'ID00099', 'ID00100', 'ID00117', 'ID00118', 'ID00314',
+        'ID00597', 'ID00088', 'ID00297', 'ID00610', 'ID00740',
+        'ID00788', 'ID00231'
+    ])
+    bad_samples |= core_bad_samples
+
+    # print(' '.join(bad_samples))
+    # return
     drug_names = {}
     with open('data/drugs.yml') as f:
         drugs = yaml.load(f, Loader=yaml.FullLoader)
@@ -99,27 +123,18 @@ def main(fastq_project):
         labs_sensitive = []
         samples = []
         locations = []
-        
-        for it in reads[1:]:
-            col = api.collections().get(uuid=it['uuid']).execute()
-            if 'sequence_label' not in it['properties']:
-                continue
-            sample_id = it['properties']['sequence_label']
-            if sample_id not in state:
-                continue
-            sample_state = state[sample_id]
-            if sample_state['status'] == 'complete':
-                out_col = api.collections().get(
-                    uuid=sample_state['output_collection']).execute()
-                if sample_id in bad_samples:
-                    continue
-                file_id = 'ID00' + sample_id[-3:]
-                with open(f'data/metadata/{file_id}.yaml') as f:
-                    metadata = yaml.load(f, Loader=yaml.FullLoader)
+        reads = os.listdir('data/resfinder')
+        for it in reads:
+            sample_id = os.path.splitext(it)[0]
+            with open(f'data/metadata/{sample_id}.yaml') as f:
+                metadata = yaml.load(f, Loader=yaml.FullLoader)
                 location_id = metadata['sample']['collection_location']
+                print(sample_id)
+                report_data['kraken'].append((sample_id, get_kraken_report(sample_id)))
+                report_data['mlst'].append((sample_id, get_mlst_report(sample_id)))
+                report_data['resistome'].append((sample_id, get_resistome_report(sample_id)))
                 location = loc_names[location_id]
-                col_reader = CollectionReader(out_col['uuid'])
-                res_drugs = get_resistome_report(col_reader)
+                res_drugs = get_resistome_report(sample_id)
                 header = res_drugs[0]
                 for item in header:
                     if item not in genotype:
@@ -130,7 +145,7 @@ def main(fastq_project):
                     for col, value in zip_longest(header, item):
                         genotype[col].append(value)
 
-                # drug_ids = set([drug_names[drugs[x]] for x in res_drugs])
+                    # drug_ids = set([drug_names[drugs[x]] for x in res_drugs])
                     if not 'susceptibility' in metadata['phenotypes']:
                         continue
                     sus = metadata['phenotypes']['susceptibility']
@@ -159,17 +174,63 @@ def main(fastq_project):
         #     drugs.append({d: 'http://purl.obolibrary.org/obo/CHEBI_18208'})
         # with open('data/drugs.yml', 'w') as w:
         #     yaml.dump({'drugs': drugs}, w)
+
+        with open('data/analysis.json', 'w') as f:
+            f.write(json.dumps(report_data))
+
     except Exception as e:
         print(sample_state)
         traceback.print_exc()
 
-def get_resistome_report(col):
+def get_resistome_report(sample_id):
     result = []
-    with col.open('abricate_resfinder.tsv', "r") as f:
+    with open(f'data/resfinder/{sample_id}.tsv', "r") as f:
         for line in f:
             it = line.strip().split('\t')
             result.append(it)
     # print()
+    return result
+
+
+def get_kraken_report(sample_id):
+    result = []
+    with open(f'data/kraken/{sample_id}.tsv', "r") as f:
+        for line in f:
+            it = line.strip().split('\t')
+            if it[3] == 'S':
+                result.append((float(it[0]), it[4], it[5].strip()))
+                if len(result) == 4:
+                    break
+    while len(result) < 4:
+        result.append((0.0, '-', '-'))
+    return result
+
+def get_mlst_report(sample_id):
+    result = []
+    with open(f'data/mlst/{sample_id}.tsv', "r") as f:
+        line = next(f)
+        it = line.strip().split('\t')
+        result = it[1:]
+    while len(result) < 9:
+        result.append('-')
+    return result
+
+def get_virulome_report(sample_id):
+    result = []
+    with col.open('abricate_vfdb.tsv', "r") as f:
+        next(f)
+        for line in f:
+            it = line.strip().split('\t')
+            result.append((it[5], float(it[9])))
+    return result
+
+def get_prokka_report(sample_id):
+    result = {'organism': '', 'contigs': '0', 'bases': '0', 'CDS': '0', 'rRNA': '0', 'tRNA': '0', 'tmRNA':'0'}
+    with open(f'data/prokka/{sample_id}.tsv', "r") as f:
+        next(f)
+        for line in f:
+            it = line.strip().split(': ')
+            result[it[0]] = it[1]
     return result
 
 

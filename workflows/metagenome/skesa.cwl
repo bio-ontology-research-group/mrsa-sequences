@@ -42,6 +42,6 @@ requirements:
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
     coresMin: 8
-    ramMin: 60720
+    ramMin: 72000
   - class: DockerRequirement
     dockerPull: "staphb/skesa:2.4.0"
