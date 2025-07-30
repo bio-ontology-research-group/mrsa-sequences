@@ -1,0 +1,19 @@
+{
+    "sample_id": "my_mrsa_sample",
+    "fastq1": {
+        "class": "File",
+        "path": "/path/to/your/sample_R1.fastq.gz"
+    },
+    "fastq2": {
+        "class": "File",
+        "path": "/path/to/your/sample_R2.fastq.gz"
+    },
+    "kraken_db": {
+        "class": "Directory",
+        "path": "/path/to/your/kraken2_database"
+    },
+    "snippy_ref": {
+        "class": "File",
+        "path": "/path/to/your/reference.fasta"
+    }
+}
